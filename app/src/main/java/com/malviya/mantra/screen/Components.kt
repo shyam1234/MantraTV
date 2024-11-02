@@ -33,12 +33,12 @@ fun MantraRender(name: String) {
 }
 
 @Composable
-fun GrayCircleWithNumber(number: Int) {
+fun GrayCircleWithNumber(number: Int, color: Color) {
     Box(
         modifier = Modifier
             .padding(10.dp)
             .size(140.dp) // Adjust size as needed
-            .background(Color.Gray, shape = CircleShape), contentAlignment = Alignment.Center
+            .background(color, shape = CircleShape), contentAlignment = Alignment.Center
 
     ) {
         Text(

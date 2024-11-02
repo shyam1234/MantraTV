@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malviya.mantra.ui.ChantViewModel
@@ -44,6 +45,10 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
 
     val count by viewModel.count.collectAsState()
 
+    val color by viewModel.color.collectAsState()
+
+    val suggestion by viewModel.chantFeedback.collectAsState()
+
     val chantLogs by viewModel.chantLogs.collectAsState()
 
     Column(
@@ -54,22 +59,30 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
 
         Spacer(modifier = Modifier.weight(1f)) // Takes up remaining space
 
+
         // Display chant logs (Mala Number and Time consumed)
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Top
-        ) {
-            items(chantLogs) { log ->
-                ChantLogItem(log)
-            }
-        }
+//        LazyColumn(
+//            modifier = Modifier.weight(1f),
+//            verticalArrangement = Arrangement.Top
+//        ) {
+//            items(chantLogs) { log ->
+//                ChantLogItem(log)
+//            }
+//        }
+
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = suggestion,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
 
         Box(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(bottom = 16.dp)
         ) {
-            GrayCircleWithNumber(count)
+            GrayCircleWithNumber(count, color)
         }
 
         Row(
