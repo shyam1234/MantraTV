@@ -20,8 +20,9 @@ This **Chant App** is designed to facilitate a meditative and spiritual experien
 - **Remote Key Events**: Support for Android TV remote buttons for increasing and decreasing the chant count.
 
 ## Screenshots
-
-![App Screenshot](https://github.com/user-attachments/assets/03457a12-dd16-4198-b065-5018a4b888ca)
+![Screenshot_20241103_030414](https://github.com/user-attachments/assets/3615ecbf-a3ce-4ace-8c50-af3b6e59e371)
+![Screenshot_20241103_030313](https://github.com/user-attachments/assets/25c2ed61-b3b8-4c8e-97da-b47919971eee)
+![Screenshot_20241103_030229](https://github.com/user-attachments/assets/c7246304-0489-4187-9b70-d78ede550ee4)
 
 ## Installation
 
