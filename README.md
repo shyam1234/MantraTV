@@ -10,6 +10,8 @@ Here’s a README file for your chant app tailored for Android TV:
 
 This **Chant App** is designed to facilitate a meditative and spiritual experience by counting the number of mala rounds. Each mala round consists of 108 chants, allowing users to focus on their chanting practice while the app helps track progress in a simple and intuitive interface. This version of the app is specifically designed for **Android TV**, making it easily accessible via TV remote navigation.
 
+We’ve added different colours to help maintain the appropriate chanting speed and ensure we complete it in 7 minutes.
+
 ## Key Features
 
 - **108 Count Cycle**: Automatically tracks each round (mala) of 108 chants.
