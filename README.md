@@ -1,7 +1,3 @@
-Here’s a README file for your chant app tailored for Android TV:
-
----
-
 # Chant App for Android TV
 
 ![App Screenshot](https://github.com/user-attachments/assets/03457a12-dd16-4198-b065-5018a4b888ca)
