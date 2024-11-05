@@ -8,7 +8,9 @@ import com.malviya.mantra.screen.ONE_MALA_ROUND_COUNT
 import com.malviya.mantra.ui.theme.Yellow40
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class ChantViewModel : ViewModel() {
 
@@ -17,6 +19,9 @@ class ChantViewModel : ViewModel() {
 
     private val _malaNumber = MutableStateFlow<Int>(0)
     val malaNumber: StateFlow<Int> = _malaNumber
+
+    private val _oneBeadTimeForRendering = MutableStateFlow<Long>(0)
+    val oneBeadTimeForRendering: StateFlow<Long> = _oneBeadTimeForRendering
 
     private val _count = MutableStateFlow<Int>(0)
     val count : StateFlow<Int> = _count
@@ -55,7 +60,9 @@ class ChantViewModel : ViewModel() {
                 }
                 // Increment the bead count
                 _count.value += 1
-                getCircleColor(System.currentTimeMillis() - oneBidTAT)
+                _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
+                getCircleColor(_oneBeadTimeForRendering.asStateFlow().value)
+                Timber.d("one bead count: ${_count.value}, time: ${_oneBeadTimeForRendering.asStateFlow().value}")
                 oneBidTAT = System.currentTimeMillis()
             }
         }
@@ -89,6 +96,21 @@ class ChantViewModel : ViewModel() {
         }
 
     }
+
+
+    fun convertMillisToReadableTime(milliseconds: Long): String {
+        val totalSeconds = milliseconds / 1000
+        val hours = totalSeconds / 3600
+        val minutes = (totalSeconds % 3600) / 60
+        val seconds = totalSeconds % 60
+
+        return when {
+            hours > 0 -> String.format("%02d:%02d:%02d", hours, minutes, seconds)+" hr"  // Show hours, minutes, and seconds
+            minutes > 0 -> String.format("%02d:%02d", minutes, seconds)+" min" // Show minutes and seconds
+            else -> String.format("%02d", seconds)+" sec"  // Show only seconds
+        }
+    }
+
 
 
 }

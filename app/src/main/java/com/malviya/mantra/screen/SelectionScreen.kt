@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malviya.mantra.ui.ChantViewModel
@@ -51,6 +48,10 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
 
     val chantLogs by viewModel.chantLogs.collectAsState()
 
+    val oneBeadTimeForRendering by viewModel.oneBeadTimeForRendering.collectAsState()
+
+    val malaNumber by viewModel.malaNumber.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxSize().background(Color.White),
         verticalArrangement = Arrangement.SpaceBetween
@@ -70,10 +71,20 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
 //            }
 //        }
 
+        if(chantLogs.isNotEmpty()) {
+            val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)//String.format("%.2f", (chantLogs.last().totalTime / (60 * 1000.0).toFloat()))
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = "Sampurnamala: ${chantLogs.last().malaNumber}/$totalTime",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             text = suggestion,
-            fontSize = 24.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
 
@@ -107,14 +118,6 @@ fun ButtonEvents(viewModel: ChantViewModel, chantLogs: List<ChantLog>) {
         Text(text = "-1", fontSize = 34.sp, fontWeight = FontWeight.Bold)
     }
 
-    if(chantLogs.isNotEmpty()) {
-        val totalTime = String.format("%.2f", (chantLogs.last().totalTime / (60 * 1000.0).toFloat()))
-        Text(
-            text = "Mala completed: ${chantLogs.last().malaNumber}/$totalTime",
-            fontSize = 34.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
     Button(onClick = {
         viewModel.incrementCount()
     }) {

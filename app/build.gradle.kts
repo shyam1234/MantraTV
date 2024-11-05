@@ -6,14 +6,14 @@ plugins {
 
 android {
     namespace = "com.malviya.mantra"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.malviya.mantra"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 9
-        versionName = "1.0.7"
+        targetSdk = 35
+        versionCode = 11
+        versionName = "1.0.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation (libs.timber)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
