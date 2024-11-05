@@ -26,8 +26,6 @@ import androidx.compose.ui.unit.sp
 import com.malviya.mantra.ui.ChantViewModel
 
 
-const val ONE_MALA_ROUND_COUNT: Int = 108
-
 // Data class to hold mala number and time consumed
 data class ChantLog(val malaNumber: Int,
                     val timeConsumed: Long,

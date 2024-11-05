@@ -4,13 +4,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.malviya.mantra.screen.ChantLog
-import com.malviya.mantra.screen.ONE_MALA_ROUND_COUNT
 import com.malviya.mantra.ui.theme.Yellow40
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+
+const val ONE_MALA_ROUND_COUNT: Int = 108
 
 class ChantViewModel : ViewModel() {
 

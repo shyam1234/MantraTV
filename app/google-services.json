@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "199350280530",
+    "project_id": "mantratv-c5d6b",
+    "storage_bucket": "mantratv-c5d6b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:199350280530:android:90f9f9f23cbd57d8909a8b",
+        "android_client_info": {
+          "package_name": "com.malviya.mantra"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwTYFiYGyoc76O0PQdJIekhJgVMrAPMGs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
