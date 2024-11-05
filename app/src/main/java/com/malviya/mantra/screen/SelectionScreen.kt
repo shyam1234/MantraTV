@@ -77,7 +77,7 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
         if(chantLogs.isNotEmpty()) {
             val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
             Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
                 text = "Sampurnamala: ${chantLogs.last().malaNumber}/$totalTime",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold

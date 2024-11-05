@@ -78,14 +78,26 @@ class ChantViewModel : ViewModel() {
 
     fun getCircleColor(timeConsumedForOneBid: Long){
         when(timeConsumedForOneBid){
-            in 0..3500 -> {
+            in 0..2999 -> {
                 _color.value = Color.Red
                 _chantFeedback.value = "You are chanting very fast!"
             }  // very fast
-            in 3501..4500 -> {
+            in 3000..3500 -> {
+                _color.value = Color.Red
+                _chantFeedback.value = "You are chanting little faster than usual!"
+            }  // very fast
+            in 3501..4900 -> {
                 _color.value = Color.Green
                 _chantFeedback.value = "You are doing good!"
             }  // good
+            in 4901..6000 -> {
+                _color.value = Yellow40
+                _chantFeedback.value = "You are chanting little slow!"
+            }
+            in 6001..8000 -> {
+                _color.value = Yellow40
+                _chantFeedback.value = "You are chanting slow!"
+            }
             else -> {
                 _color.value = Yellow40
                 _chantFeedback.value = "You are chanting very slow!"
