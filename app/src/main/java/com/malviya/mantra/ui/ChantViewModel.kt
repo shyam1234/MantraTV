@@ -43,27 +43,28 @@ class ChantViewModel : ViewModel() {
                 // Mala round is completed, reset count and log time
                 _count.value = 0
                 _malaNumber.value += 1
-
+                _color.value = Color.Gray
+                _chantFeedback.value = "Let's Begin"
                 // Calculate time taken for the current mala and log it
-                val timeDiff = System.currentTimeMillis() - startTime
-                totalTime += timeDiff
-                _chantLogs.value += ChantLog(_malaNumber.value, timeDiff,totalTime )
+                val malaCompletedTime = System.currentTimeMillis() - startTime
+                totalTime += malaCompletedTime
+                _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime,totalTime )
 
-                // Reset start time for the next mala
-                startTime = System.currentTimeMillis()
-                oneBidTAT = System.currentTimeMillis()
             } else {
                 // Start time when count is 1 (first bead in mala)
                 if (_count.value == 0) {
                     startTime = System.currentTimeMillis()
-                    oneBidTAT = System.currentTimeMillis()
+                    _oneBeadTimeForRendering.value = 4000
+                }else{
+                    _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
                 }
-                // Increment the bead count
-                _count.value += 1
-                _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
+
                 getCircleColor(_oneBeadTimeForRendering.asStateFlow().value)
-                Timber.d("one bead count: ${_count.value}, time: ${_oneBeadTimeForRendering.asStateFlow().value}")
+                // Increment the bead count
                 oneBidTAT = System.currentTimeMillis()
+                _count.value += 1
+                //-----------------------
+                Timber.d("one bead count: ${_count.value}, time: ${_oneBeadTimeForRendering.asStateFlow().value}")
             }
         }
     }
@@ -77,11 +78,7 @@ class ChantViewModel : ViewModel() {
 
     fun getCircleColor(timeConsumedForOneBid: Long){
         when(timeConsumedForOneBid){
-            in 0..20 -> {
-                _color.value = Color.Green
-                _chantFeedback.value = "Let's Begin!"
-            }  // not started yet
-            in 51..3500 -> {
+            in 0..3500 -> {
                 _color.value = Color.Red
                 _chantFeedback.value = "You are chanting very fast!"
             }  // very fast

@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -72,7 +75,7 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
 //        }
 
         if(chantLogs.isNotEmpty()) {
-            val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)//String.format("%.2f", (chantLogs.last().totalTime / (60 * 1000.0).toFloat()))
+            val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = "Sampurnamala: ${chantLogs.last().malaNumber}/$totalTime",
@@ -110,22 +113,31 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
 
 @Composable
 fun ButtonEvents(viewModel: ChantViewModel, chantLogs: List<ChantLog>) {
+    // Create a FocusRequester
+    val focusRequester = FocusRequester()
+
+    // Use LaunchedEffect to request focus
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     Button(onClick = {
-        // if (count > 1) count--
         viewModel.decrementCount()
-        //chantLogs = chantLogs.dropLast(1) // Remove last entry when decrementing
     }) {
         Text(text = "-1", fontSize = 34.sp, fontWeight = FontWeight.Bold)
     }
 
-    Button(onClick = {
-        viewModel.incrementCount()
-    }) {
+    // Apply focusRequester to the right button
+    Button(
+        onClick = {
+            viewModel.incrementCount()
+        },
+        modifier = Modifier.focusRequester(focusRequester)
+    ) {
         Text(text = "+1", fontSize = 34.sp, fontWeight = FontWeight.Bold)
     }
-
-
 }
+
 
 
 
