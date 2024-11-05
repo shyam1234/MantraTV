@@ -1,7 +1,3 @@
-Here’s a README file for your chant app tailored for Android TV:
-
----
-
 # Chant App for Android TV
 
 ![App Screenshot](https://github.com/user-attachments/assets/03457a12-dd16-4198-b065-5018a4b888ca)
@@ -9,6 +5,8 @@ Here’s a README file for your chant app tailored for Android TV:
 ## Overview
 
 This **Chant App** is designed to facilitate a meditative and spiritual experience by counting the number of mala rounds. Each mala round consists of 108 chants, allowing users to focus on their chanting practice while the app helps track progress in a simple and intuitive interface. This version of the app is specifically designed for **Android TV**, making it easily accessible via TV remote navigation.
+
+We’ve added different colours to help maintain the appropriate chanting speed and ensure we complete it in 7 minutes.
 
 ## Key Features
 
@@ -20,8 +18,11 @@ This **Chant App** is designed to facilitate a meditative and spiritual experien
 - **Remote Key Events**: Support for Android TV remote buttons for increasing and decreasing the chant count.
 
 ## Screenshots
-
-![App Screenshot](https://github.com/user-attachments/assets/03457a12-dd16-4198-b065-5018a4b888ca)
+![Screenshot_20241103_030414](https://github.com/user-attachments/assets/3615ecbf-a3ce-4ace-8c50-af3b6e59e371)
+![Screenshot_20241103_030313](https://github.com/user-attachments/assets/25c2ed61-b3b8-4c8e-97da-b47919971eee)
+![Screenshot_20241103_030229](https://github.com/user-attachments/assets/c7246304-0489-4187-9b70-d78ede550ee4)
+![Screenshot_20241103_195936](https://github.com/user-attachments/assets/80b19ee6-3a86-445d-be88-3366877a7a87)
+![Screenshot_20241103_195906](https://github.com/user-attachments/assets/d0f939a0-7c92-41fe-bcb6-7ef1bbc33404)
 
 ## Installation
 
