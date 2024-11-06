@@ -21,6 +21,7 @@ We’ve added different colours to help maintain the appropriate chanting speed 
 ![Screenshot_20241103_030414](https://github.com/user-attachments/assets/3615ecbf-a3ce-4ace-8c50-af3b6e59e371)
 ![Screenshot_20241103_030313](https://github.com/user-attachments/assets/25c2ed61-b3b8-4c8e-97da-b47919971eee)
 ![Screenshot_20241103_030229](https://github.com/user-attachments/assets/c7246304-0489-4187-9b70-d78ede550ee4)
+![Screenshot_20241106_112924](https://github.com/user-attachments/assets/69f1bdac-5ab8-4978-bd1a-e86111de4dd1)
 ![Screenshot_20241103_195936](https://github.com/user-attachments/assets/80b19ee6-3a86-445d-be88-3366877a7a87)
 ![Screenshot_20241103_195906](https://github.com/user-attachments/assets/d0f939a0-7c92-41fe-bcb6-7ef1bbc33404)
 
