@@ -22,16 +22,16 @@ class MainActivity : ComponentActivity() {
         analytics = Firebase.analytics
         //enableEdgeToEdge()
         setContent {
-            MantraTheme {
-                /*Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            /*MantraTheme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
                         name = stringResource(R.string.greeting),
                         modifier = Modifier.padding(innerPadding)
                     )
-                }*/
-                MantraTheme {
-                    GreetingScreen( name = stringResource(R.string.greeting),chantViewModel)
                 }
+            }*/
+            MantraTheme {
+                GreetingScreen( name = stringResource(R.string.greeting),chantViewModel)
             }
         }
     }
