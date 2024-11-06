@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Obtain the FirebaseAnalytics instance.
         analytics = Firebase.analytics
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         setContent {
             MantraTheme {
                 /*Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
