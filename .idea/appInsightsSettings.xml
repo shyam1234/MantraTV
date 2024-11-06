@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.malviya.mantra" />
+                  <option name="mobileSdkAppId" value="1:199350280530:android:90f9f9f23cbd57d8909a8b" />
+                  <option name="projectId" value="mantratv-c5d6b" />
+                  <option name="projectNumber" value="199350280530" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
