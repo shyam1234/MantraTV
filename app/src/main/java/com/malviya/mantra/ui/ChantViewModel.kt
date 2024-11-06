@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-const val ONE_MALA_ROUND_COUNT: Int = 108
+const val ONE_MALA_ROUND_COUNT: Int = 10
+const val IDLE_TIME_FOR_ONE_BEAD: Long = 4000
 
 class ChantViewModel : ViewModel() {
 
@@ -43,27 +44,33 @@ class ChantViewModel : ViewModel() {
             if (_count.value == ONE_MALA_ROUND_COUNT) {
                 // Mala round is completed, reset count and log time
                 _count.value = 0
-                _malaNumber.value += 1
                 _color.value = Color.Gray
                 _chantFeedback.value = "Let's Begin"
-                // Calculate time taken for the current mala and log it
-                val malaCompletedTime = System.currentTimeMillis() - startTime
-                totalTime += malaCompletedTime
-                _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime,totalTime )
 
             } else {
                 // Start time when count is 1 (first bead in mala)
                 if (_count.value == 0) {
                     startTime = System.currentTimeMillis()
-                    _oneBeadTimeForRendering.value = 4000
+                    _oneBeadTimeForRendering.value = IDLE_TIME_FOR_ONE_BEAD
                 }else{
                     _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
                 }
 
                 getCircleColor(_oneBeadTimeForRendering.asStateFlow().value)
+
+                if (_count.value == ONE_MALA_ROUND_COUNT-1) {
+                    // Calculate time taken for the current mala and log it
+                    _malaNumber.value += 1
+                    val malaCompletedTime = System.currentTimeMillis() - startTime
+                    totalTime += malaCompletedTime
+                    _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime,totalTime )
+
+                }
                 // Increment the bead count
                 oneBidTAT = System.currentTimeMillis()
                 _count.value += 1
+
+
                 //-----------------------
                 Timber.d("one bead count: ${_count.value}, time: ${_oneBeadTimeForRendering.asStateFlow().value}")
             }
@@ -104,7 +111,6 @@ class ChantViewModel : ViewModel() {
                 _chantFeedback.value = "You are chanting very slow!"
             }   // very slow
         }
-
     }
 
 

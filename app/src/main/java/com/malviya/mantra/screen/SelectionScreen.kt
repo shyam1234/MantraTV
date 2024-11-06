@@ -94,7 +94,7 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
                 .align(Alignment.CenterHorizontally)
                 .padding(bottom = 16.dp)
         ) {
-            GrayCircleWithNumber(count, color)
+            GrayCircleWithNumber2(count, color)
         }
 
         Row(
