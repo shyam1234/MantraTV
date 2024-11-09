@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,17 +54,22 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
     val oneBeadTimeForRendering by viewModel.oneBeadTimeForRendering.collectAsState()
 
     val malaNumber by viewModel.malaNumber.collectAsState()
-
-    Column(
-        modifier = Modifier.fillMaxSize().background(Color.White),
-        verticalArrangement = Arrangement.SpaceBetween
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .verticalScroll(rememberScrollState()) // Enables vertical scrolling
     ) {
-        MantraRender(name)
+        Column(
+            modifier = Modifier.fillMaxSize().background(Color.White),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            MantraRender(name)
 
-        Spacer(modifier = Modifier.weight(1f)) // Takes up remaining space
+            Spacer(modifier = Modifier.weight(1f)) // Takes up remaining space
 
 
-        // Display chant logs (Mala Number and Time consumed)
+            // Display chant logs (Mala Number and Time consumed)
 //        LazyColumn(
 //            modifier = Modifier.weight(1f),
 //            verticalArrangement = Arrangement.Top
@@ -72,41 +79,41 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
 //            }
 //        }
 
-        if(chantLogs.isNotEmpty()) {
-            val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
+            if (chantLogs.isNotEmpty()) {
+                val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
+                    text = "Sampurnamala: ${chantLogs.last().malaNumber}/$totalTime",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
             Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
-                text = "Sampurnamala: ${chantLogs.last().malaNumber}/$totalTime",
-                fontSize = 24.sp,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = suggestion,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
-        }
 
-        Text(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = suggestion,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 16.dp)
+            ) {
+                GrayCircleWithNumber2(count, color)
+            }
 
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(bottom = 16.dp)
-        ) {
-            GrayCircleWithNumber2(count, color)
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            ButtonEvents(viewModel,chantLogs)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                ButtonEvents(viewModel, chantLogs)
+            }
         }
     }
-
 }
 
 @Composable
