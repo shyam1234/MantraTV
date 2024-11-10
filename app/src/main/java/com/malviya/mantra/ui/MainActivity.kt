@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.compose.ui.res.stringResource
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import com.malviya.mantra.R
 import com.malviya.mantra.screen.GreetingScreen
@@ -32,7 +33,7 @@ class MainActivity : ComponentActivity() {
         // Obtain the FirebaseAnalytics instance.
         analytics = Firebase.analytics
         // Initialize Firebase Crashlytics
-        //FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = true
+        FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = true
 
     }
 }
