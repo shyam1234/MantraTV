@@ -103,7 +103,22 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
                 ButtonEvents(viewModel, chantLogs)
             }
         }
+
+        // Watermark text at the bottom center
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp)
+        ) {
+            Text(
+                text = "Brought to you by Malviya Technologies",
+                color = Color.LightGray,
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Light
+            )
+        }
     }
+
 }
 
 @Composable
