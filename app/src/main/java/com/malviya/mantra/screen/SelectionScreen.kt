@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malviya.mantra.ui.ChantViewModel
+import java.util.Locale
 
 
 // Data class to hold mala number and time consumed
@@ -36,13 +37,6 @@ data class ChantLog(val malaNumber: Int,
 
 @Composable
 fun GreetingScreen(name : String, viewModel: ChantViewModel) {
-    // State to hold the list of mala numbers and times
-//    var malaNumber by remember { mutableIntStateOf(1) }
-//    var chantLogs by remember { mutableStateOf(listOf<ChantLog>()) }
-//    var startTime by remember { mutableLongStateOf(0L) }
-//    var count by remember { mutableIntStateOf(0) }
-//    val malaNumber by viewModel.malaNumber.collectAsState()
-
     val count by viewModel.count.collectAsState()
 
     val color by viewModel.color.collectAsState()
@@ -68,22 +62,18 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
 
             Spacer(modifier = Modifier.weight(1f)) // Takes up remaining space
 
-
-            // Display chant logs (Mala Number and Time consumed)
-//        LazyColumn(
-//            modifier = Modifier.weight(1f),
-//            verticalArrangement = Arrangement.Top
-//        ) {
-//            items(chantLogs) { log ->
-//                ChantLogItem(log)
-//            }
-//        }
-
             if (chantLogs.isNotEmpty()) {
                 val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
                     text = "Sampurnamala: ${chantLogs.last().malaNumber}/$totalTime",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }else{
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
+                    text = " ",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -150,7 +140,7 @@ fun ButtonEvents(viewModel: ChantViewModel, chantLogs: List<ChantLog>) {
 private fun ChantLogItem(log: ChantLog) {
     Text(
         text = "Mala: ${log.malaNumber}, Time: ${
-            String.format(
+            String.format(Locale.US,
                 "%.2f",
                 log.timeConsumed / (60 * 1000.0)
             )

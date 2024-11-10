@@ -10,8 +10,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Locale
 
-const val ONE_MALA_ROUND_COUNT: Int = 108
+const val ONE_MALA_ROUND_COUNT: Int = 10
 const val IDLE_TIME_FOR_ONE_BEAD: Long = 4000
 
 class ChantViewModel : ViewModel() {
@@ -121,9 +122,9 @@ class ChantViewModel : ViewModel() {
         val seconds = totalSeconds % 60
 
         return when {
-            hours > 0 -> String.format("%02d:%02d:%02d", hours, minutes, seconds)+" hr"  // Show hours, minutes, and seconds
-            minutes > 0 -> String.format("%02d:%02d", minutes, seconds)+" min" // Show minutes and seconds
-            else -> String.format("%02d", seconds)+" sec"  // Show only seconds
+            hours > 0 -> String.format(Locale.US,"%02d:%02d:%02d", hours, minutes, seconds)+" hr"  // Show hours, minutes, and seconds
+            minutes > 0 -> String.format(Locale.US,"%02d:%02d", minutes, seconds)+" min" // Show minutes and seconds
+            else -> String.format(Locale.US,"%02d", seconds)+" sec"  // Show only seconds
         }
     }
 

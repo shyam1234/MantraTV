@@ -24,14 +24,6 @@ class MainActivity : ComponentActivity() {
 
         //enableEdgeToEdge()
         setContent {
-            /*MantraTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = stringResource(R.string.greeting),
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }*/
             MantraTheme {
                 GreetingScreen( name = stringResource(R.string.greeting),chantViewModel)
             }
