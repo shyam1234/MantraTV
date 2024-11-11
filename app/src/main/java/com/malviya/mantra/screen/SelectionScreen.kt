@@ -57,10 +57,12 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .verticalScroll(rememberScrollState()) // Enables vertical scrolling
+            .verticalScroll(rememberScrollState()), // Enables vertical scrolling
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().background(Color.White),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             MantraRender(name)

@@ -3,6 +3,7 @@ package com.malviya.mantra.screen
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,7 +28,7 @@ import kotlin.math.sin
 fun MantraRender(name: String) {
     Text(
         text = name,
-        style = MaterialTheme.typography.titleLarge.copy(fontSize = 48.sp, lineHeight = 80.sp),
+        style = MaterialTheme.typography.titleLarge.copy(fontSize = 38.sp, lineHeight = 80.sp),
         textAlign = TextAlign.Center,
         color = Color.Black,
         fontWeight = FontWeight.Bold,

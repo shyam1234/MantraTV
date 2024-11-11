@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Locale
 
-const val ONE_MALA_ROUND_COUNT: Int = 108
+const val ONE_MALA_ROUND_COUNT: Int = 10
 const val IDLE_TIME_FOR_ONE_BEAD: Long = 4000
 
 class ChantViewModel : ViewModel() {
