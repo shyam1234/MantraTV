@@ -1,0 +1,13 @@
+<resources>
+    <string name="greeting">哈利克里希纳，哈利克里希纳，克里希纳克里希纳，哈利哈利。\n哈利拉姆，哈利拉姆，拉姆拉姆，哈利哈利。</string>
+    <string name="sampurnamala">完整的玛拉: %1$d / %2$s</string>
+    <string name="powered_by">由Malviya Technologies提供</string>
+    <string name="chant_feedback_begin">开始吧</string>
+    <string name="chant_feedback_very_fast">你念得非常快！</string>
+    <string name="chant_feedback_fast">你念得比平时稍微快一点！</string>
+    <string name="chant_feedback_good">你做得很好！</string>
+    <string name="chant_feedback_slow_than_usual">你念得比平时慢一点！</string>
+    <string name="chant_feedback_slow">你念得很慢！</string>
+    <string name="chant_feedback_very_slow">你念得非常慢！</string>
+</resources>
+

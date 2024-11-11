@@ -1,0 +1,12 @@
+<resources>
+    <string name="greeting">Hare Krishna, Hare Krishna, Krishna Krishna, Hare Hare.\nHare Rama, Hare Rama, Rama Rama, Hare Hare.</string>
+    <string name="sampurnamala">Mala completo: %1$d / %2$s</string>
+    <string name="powered_by">Presentado por Malviya Technologies</string>
+    <string name="chant_feedback_begin">Comencemos</string>
+    <string name="chant_feedback_very_fast">¡Estás cantando muy rápido!</string>
+    <string name="chant_feedback_fast">¡Estás cantando un poco más rápido de lo habitual!</string>
+    <string name="chant_feedback_good">¡Lo estás haciendo bien!</string>
+    <string name="chant_feedback_slow_than_usual">¡Estás cantando un poco más lento de lo habitual!</string>
+    <string name="chant_feedback_slow">¡Estás cantando lento!</string>
+    <string name="chant_feedback_very_slow">¡Estás cantando muy lento!</string>
+</resources>

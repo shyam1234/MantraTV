@@ -17,6 +17,23 @@ const val IDLE_TIME_FOR_ONE_BEAD: Long = 4000
 
 class ChantViewModel : ViewModel() {
 
+    sealed class ChantFeedback {
+        object Begin : ChantFeedback()
+        object VeryFast : ChantFeedback()
+        object Fast : ChantFeedback()
+        object Good : ChantFeedback()
+        object SlowThanUsual : ChantFeedback()
+        object Slow : ChantFeedback()
+        object VerySlow : ChantFeedback()
+    }
+
+
+    private val _chantFeedback = MutableStateFlow<ChantFeedback>(ChantFeedback.Begin)
+    val chantFeedback: StateFlow<ChantFeedback> = _chantFeedback
+
+    private val _color = MutableStateFlow(Color.Gray)
+    val color: StateFlow<Color> = _color
+
    private val _chantLogs = MutableStateFlow(listOf<ChantLog>())
     val chantLogs: StateFlow<List<ChantLog>> = _chantLogs
 
@@ -29,11 +46,6 @@ class ChantViewModel : ViewModel() {
     private val _count = MutableStateFlow<Int>(0)
     val count : StateFlow<Int> = _count
 
-    private val _color = MutableStateFlow<Color>(Color.Gray)
-    val color : StateFlow<Color> = _color
-
-    private val _chantFeedback = MutableStateFlow<String>("Let's Begin")
-    val chantFeedback : StateFlow<String> = _chantFeedback
 
 
     private var startTime = System.currentTimeMillis()
@@ -46,7 +58,7 @@ class ChantViewModel : ViewModel() {
                 // Mala round is completed, reset count and log time
                 _count.value = 0
                 _color.value = Color.Gray
-                _chantFeedback.value = "Let's Begin"
+                _chantFeedback.value = ChantFeedback.Begin
 
             } else {
                 // Start time when count is 1 (first bead in mala)
@@ -89,27 +101,27 @@ class ChantViewModel : ViewModel() {
         when(timeConsumedForOneBid){
             in 0..2999 -> {
                 _color.value = Color.Red
-                _chantFeedback.value = "You are chanting very fast!"
+                _chantFeedback.value = ChantFeedback.VeryFast
             }  // very fast
             in 3000..3500 -> {
                 _color.value = Color.Red
-                _chantFeedback.value = "You are chanting little faster than usual!"
+                _chantFeedback.value = ChantFeedback.Fast
             }  // very fast
             in 3501..4900 -> {
                 _color.value = Color.Green
-                _chantFeedback.value = "You are doing good!"
+                _chantFeedback.value = ChantFeedback.Good
             }  // good
             in 4901..6000 -> {
                 _color.value = Yellow40
-                _chantFeedback.value = "You are chanting little slow!"
+                _chantFeedback.value = ChantFeedback.SlowThanUsual
             }
             in 6001..8000 -> {
                 _color.value = Yellow40
-                _chantFeedback.value = "You are chanting slow!"
+                _chantFeedback.value = ChantFeedback.Slow
             }
             else -> {
                 _color.value = Yellow40
-                _chantFeedback.value = "You are chanting very slow!"
+                _chantFeedback.value = ChantFeedback.VerySlow
             }   // very slow
         }
     }
