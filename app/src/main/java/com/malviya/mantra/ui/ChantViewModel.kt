@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.malviya.mantra.screen.ChantLog
 import com.malviya.mantra.ui.theme.Yellow40
+import com.malviya.mantra.utils.AnalyticsManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,10 +13,12 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Locale
 
-const val ONE_MALA_ROUND_COUNT: Int = 108
+const val ONE_MALA_ROUND_COUNT: Int = 10
 const val IDLE_TIME_FOR_ONE_BEAD: Long = 4000
 
-class ChantViewModel : ViewModel() {
+class ChantViewModel(
+    private val analyticsManager: AnalyticsManager
+) : ViewModel() {
 
     sealed class ChantFeedback {
         object Begin : ChantFeedback()
@@ -46,11 +49,13 @@ class ChantViewModel : ViewModel() {
     private val _count = MutableStateFlow<Int>(0)
     val count : StateFlow<Int> = _count
 
-
-
     private var startTime = System.currentTimeMillis()
     private var oneBidTAT = System.currentTimeMillis()
     private var totalTime = 0L
+
+    override fun onCleared() {
+
+    }
 
     fun incrementCount() {
         viewModelScope.launch {
@@ -59,7 +64,6 @@ class ChantViewModel : ViewModel() {
                 _count.value = 0
                 _color.value = Color.Gray
                 _chantFeedback.value = ChantFeedback.Begin
-
             } else {
                 // Start time when count is 1 (first bead in mala)
                 if (_count.value == 0) {
@@ -77,7 +81,8 @@ class ChantViewModel : ViewModel() {
                     val malaCompletedTime = System.currentTimeMillis() - startTime
                     totalTime += malaCompletedTime
                     _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime,totalTime )
-
+                    analyticsManager.logSingleMalaComplete(_chantLogs.value.last().malaNumber.toString(), malaCompletedTime)
+                    analyticsManager.logSampurnamalaComplete(_chantLogs.value.last().malaNumber.toString(), malaCompletedTime)
                 }
                 // Increment the bead count
                 oneBidTAT = System.currentTimeMillis()
