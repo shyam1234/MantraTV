@@ -28,7 +28,7 @@ import kotlin.math.sin
 fun MantraRender(name: String) {
     Text(
         text = name,
-        style = MaterialTheme.typography.titleLarge.copy(fontSize = 38.sp, lineHeight = 80.sp),
+        style = MaterialTheme.typography.titleLarge.copy(fontSize = 36.sp, lineHeight = 60.sp),
         textAlign = TextAlign.Center,
         color = Color.Black,
         fontWeight = FontWeight.Bold,
