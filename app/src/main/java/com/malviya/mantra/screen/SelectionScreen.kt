@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -105,7 +106,7 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 ButtonEvents(viewModel)
             }
@@ -145,6 +146,9 @@ private fun getChantFeedback(chantFeedback: ChantViewModel.ChantFeedback) : Stri
 fun ButtonEvents(viewModel: ChantViewModel) {
     val decrementText = stringResource(id = R.string.decrement_button)
     val incrementText = stringResource(id = R.string.increment_button)
+    val autoChantOnText = stringResource(id = R.string.auto_chant_on)
+    val autoChantOffText = stringResource(id = R.string.auto_chant_off)
+    val isAutoChanting by viewModel.isAutoChanting.collectAsState()
     // Create a FocusRequester
     val focusRequester = FocusRequester()
 
@@ -153,20 +157,41 @@ fun ButtonEvents(viewModel: ChantViewModel) {
         focusRequester.requestFocus()
     }
 
-    Button(onClick = {
-        viewModel.decrementCount()
-    }) {
-        Text(text = decrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold)
-    }
-
-    // Apply focusRequester to the right button
-    Button(
-        onClick = {
-            viewModel.incrementCount()
-        },
-        modifier = Modifier.focusRequester(focusRequester)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Text(text = incrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+        Button(onClick = {
+            viewModel.decrementCount()
+        }) {
+            Text(text = decrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+        }
+
+        // Auto Chant Toggle Button
+        Button(
+            onClick = { viewModel.toggleAutoChant() },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isAutoChanting) Color.Green else Color.Gray
+            )
+        ) {
+            Text(
+                text = if (isAutoChanting) autoChantOnText else autoChantOffText,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        // Apply focusRequester to the right button
+        Button(
+            onClick = {
+                viewModel.incrementCount()
+            },
+            modifier = Modifier.focusRequester(focusRequester)
+        ) {
+            Text(text = incrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+        }
     }
 }
 

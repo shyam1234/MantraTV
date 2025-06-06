@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.Locale
 
-const val ONE_MALA_ROUND_COUNT: Int = 10
-const val IDLE_TIME_FOR_ONE_BEAD: Long = 4000
+const val ONE_MALA_ROUND_COUNT: Int = 108
+const val IDLE_TIME_FOR_ONE_BEAD: Long = 4500
 
 class ChantViewModel : ViewModel() {
 
@@ -27,6 +28,8 @@ class ChantViewModel : ViewModel() {
         object VerySlow : ChantFeedback()
     }
 
+    private val _isAutoChanting = MutableStateFlow(false)
+    val isAutoChanting: StateFlow<Boolean> = _isAutoChanting
 
     private val _chantFeedback = MutableStateFlow<ChantFeedback>(ChantFeedback.Begin)
     val chantFeedback: StateFlow<ChantFeedback> = _chantFeedback
@@ -34,7 +37,7 @@ class ChantViewModel : ViewModel() {
     private val _color = MutableStateFlow(Color.Gray)
     val color: StateFlow<Color> = _color
 
-   private val _chantLogs = MutableStateFlow(listOf<ChantLog>())
+    private val _chantLogs = MutableStateFlow<List<ChantLog>>(emptyList())
     val chantLogs: StateFlow<List<ChantLog>> = _chantLogs
 
     private val _malaNumber = MutableStateFlow<Int>(0)
@@ -46,11 +49,25 @@ class ChantViewModel : ViewModel() {
     private val _count = MutableStateFlow<Int>(0)
     val count : StateFlow<Int> = _count
 
-
-
     private var startTime = System.currentTimeMillis()
     private var oneBidTAT = System.currentTimeMillis()
     private var totalTime = 0L
+
+    fun toggleAutoChant() {
+        _isAutoChanting.value = !_isAutoChanting.value
+        if (_isAutoChanting.value) {
+            startAutoChant()
+        }
+    }
+
+    private fun startAutoChant() {
+        viewModelScope.launch {
+            while (_isAutoChanting.value) {
+                incrementCount()
+                delay(IDLE_TIME_FOR_ONE_BEAD)
+            }
+        }
+    }
 
     fun incrementCount() {
         viewModelScope.launch {
@@ -59,37 +76,32 @@ class ChantViewModel : ViewModel() {
                 _count.value = 0
                 _color.value = Color.Gray
                 _chantFeedback.value = ChantFeedback.Begin
-
-            } else {
-                // Start time when count is 1 (first bead in mala)
-                if (_count.value == 0) {
-                    startTime = System.currentTimeMillis()
-                    _oneBeadTimeForRendering.value = IDLE_TIME_FOR_ONE_BEAD
-                }else{
-                    _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
-                }
-
-                getCircleColor(_oneBeadTimeForRendering.asStateFlow().value)
-
-                if (_count.value == ONE_MALA_ROUND_COUNT-1) {
-                    // Calculate time taken for the current mala and log it
-                    _malaNumber.value += 1
-                    val malaCompletedTime = System.currentTimeMillis() - startTime
-                    totalTime += malaCompletedTime
-                    _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime,totalTime )
-
-                }
-                // Increment the bead count
-                oneBidTAT = System.currentTimeMillis()
-                _count.value += 1
-
-
-                //-----------------------
-                Timber.d("one bead count: ${_count.value}, time: ${_oneBeadTimeForRendering.asStateFlow().value}")
             }
+
+            // Start time when count is 1 (first bead in mala)
+            if (_count.value == 0) {
+                startTime = System.currentTimeMillis()
+                _oneBeadTimeForRendering.value = IDLE_TIME_FOR_ONE_BEAD
+            } else {
+                _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
+            }
+
+            getCircleColor(_oneBeadTimeForRendering.asStateFlow().value)
+
+            if (_count.value == ONE_MALA_ROUND_COUNT-1) {
+                // Calculate time taken for the current mala and log it
+                _malaNumber.value += 1
+                val malaCompletedTime = System.currentTimeMillis() - startTime
+                totalTime += malaCompletedTime
+                _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime, totalTime)
+            }
+            // Increment the bead count
+            oneBidTAT = System.currentTimeMillis()
+            _count.value += 1
+
+            Timber.d("one bead count: ${_count.value}, time: ${_oneBeadTimeForRendering.asStateFlow().value}")
         }
     }
-
 
     fun decrementCount() {
         if (_count.value > 0) {
@@ -126,7 +138,6 @@ class ChantViewModel : ViewModel() {
         }
     }
 
-
     fun convertMillisToReadableTime(milliseconds: Long): String {
         val totalSeconds = milliseconds / 1000
         val hours = totalSeconds / 3600
@@ -139,7 +150,4 @@ class ChantViewModel : ViewModel() {
             else -> String.format(Locale.US,"%02d", seconds)+" sec"  // Show only seconds
         }
     }
-
-
-
 }

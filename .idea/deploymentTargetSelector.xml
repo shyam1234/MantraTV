@@ -2,35 +2,16 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="app">
+      <SelectionState runConfigName="Mantra.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-11T04:48:38.534042Z">
+        <DropdownSelection timestamp="2024-12-01T12:59:36.372213Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="Default" identifier="serial=192.168.1.20:5555;connection=aab035e4" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/shreeganesha/.android/avd/Television_4K_API_34.avd" />
             </handle>
           </Target>
         </DropdownSelection>
-        <DialogSelection>
-          <targets>
-            <Target type="DEFAULT_BOOT">
-              <handle>
-                <DeviceId pluginId="FirebaseDirectAccess" identifier="reservation=projects/mantratv-c5d6b/deviceSessions/session-2kmu2clppc25m" />
-              </handle>
-              <template>
-                <DeviceId pluginId="FirebaseDirectAccess" type="TEMPLATE" identifier="model_id=caiman/34" />
-              </template>
-            </Target>
-            <Target type="DEFAULT_BOOT">
-              <handle>
-                <DeviceId pluginId="Default" identifier="serial=192.168.1.20:5555;connection=a8b946f5" />
-              </handle>
-            </Target>
-          </targets>
-        </DialogSelection>
-      </SelectionState>
-      <SelectionState runConfigName="GreetingPreview">
-        <option name="selectionMode" value="DROPDOWN" />
+        <DialogSelection />
       </SelectionState>
     </selectionStates>
   </component>

@@ -12,4 +12,6 @@
     <string name="chant_feedback_slow_than_usual">आप थोड़ा धीमे जाप कर रहे हैं!</string>
     <string name="chant_feedback_slow">आप धीमे जाप कर रहे हैं!</string>
     <string name="chant_feedback_very_slow">आप बहुत धीमे जाप कर रहे हैं!</string>
+    <string name="auto_chant_on">ऑटो जाप चालू</string>
+    <string name="auto_chant_off">ऑटो जाप बंद</string>
 </resources>
