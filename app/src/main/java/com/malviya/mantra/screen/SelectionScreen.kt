@@ -164,7 +164,7 @@ fun ButtonEvents(viewModel: ChantViewModel) {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Button(onClick = {
-            viewModel.decrementCount()
+            viewModel.decrementCount(true)
         }) {
             Text(text = decrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold)
         }
@@ -186,7 +186,7 @@ fun ButtonEvents(viewModel: ChantViewModel) {
         // Apply focusRequester to the right button
         Button(
             onClick = {
-                viewModel.incrementCount()
+                viewModel.incrementCount(true)
             },
             modifier = Modifier.focusRequester(focusRequester)
         ) {

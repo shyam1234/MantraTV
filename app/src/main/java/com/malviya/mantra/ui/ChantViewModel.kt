@@ -14,7 +14,7 @@ import timber.log.Timber
 import java.util.Locale
 
 const val ONE_MALA_ROUND_COUNT: Int = 108
-const val IDLE_TIME_FOR_ONE_BEAD: Long = 4500
+const val IDLE_TIME_FOR_ONE_BEAD: Long = 4800
 
 class ChantViewModel : ViewModel() {
 
@@ -63,13 +63,14 @@ class ChantViewModel : ViewModel() {
     private fun startAutoChant() {
         viewModelScope.launch {
             while (_isAutoChanting.value) {
-                incrementCount()
                 delay(IDLE_TIME_FOR_ONE_BEAD)
+                incrementCount()
             }
         }
     }
 
-    fun incrementCount() {
+    fun incrementCount(isOnClicked : Boolean = false) {
+        if(isOnClicked && _isAutoChanting.value) return
         viewModelScope.launch {
             if (_count.value == ONE_MALA_ROUND_COUNT) {
                 // Mala round is completed, reset count and log time
@@ -103,7 +104,8 @@ class ChantViewModel : ViewModel() {
         }
     }
 
-    fun decrementCount() {
+    fun decrementCount(isOnClicked : Boolean = false) {
+        if(isOnClicked && _isAutoChanting.value) return
         if (_count.value > 0) {
             _count.value -= 1
         }
