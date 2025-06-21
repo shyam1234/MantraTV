@@ -28,9 +28,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.malviya.mantra.R
 import com.malviya.mantra.ui.ChantViewModel
 import java.util.Locale
-import com.malviya.mantra.R
 
 // Data class to hold mala number and time consumed
 data class ChantLog(val malaNumber: Int,
@@ -45,6 +45,7 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
     val chantLogs by viewModel.chantLogs.collectAsState()
     val context = LocalContext.current
     val poweredBy = stringResource(id = R.string.powered_by)
+    val buildNumber = context.packageManager.getPackageInfo(context.packageName, 0).versionName
     val sampurnamalaFormat = context.getString(R.string.sampurnamala)
     // Map feedback state to localized strings
     val chantFeedback by viewModel.chantFeedback.collectAsState()
@@ -116,15 +117,24 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
+                .padding(bottom = 10.dp)
         ) {
-            Text(
-                text = poweredBy,
-                color = Color.LightGray,
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Light
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = poweredBy,
+                    color = Color.LightGray,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Light
+                )
+                Text(
+                    text = "v$buildNumber",
+                    color = Color.LightGray,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Light
+                )
+            }
         }
+
     }
 
 }

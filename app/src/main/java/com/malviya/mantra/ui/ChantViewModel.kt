@@ -3,13 +3,16 @@ package com.malviya.mantra.ui
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.malviya.mantra.firebase.logAutoChant
+import com.malviya.mantra.firebase.logManualChant
+import com.malviya.mantra.firebase.logSampurnaMala
 import com.malviya.mantra.screen.ChantLog
 import com.malviya.mantra.ui.theme.Yellow40
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.Locale
 
@@ -17,7 +20,6 @@ const val ONE_MALA_ROUND_COUNT: Int = 108
 const val IDLE_TIME_FOR_ONE_BEAD: Long = 4800
 
 class ChantViewModel : ViewModel() {
-
     sealed class ChantFeedback {
         object Begin : ChantFeedback()
         object VeryFast : ChantFeedback()
@@ -58,6 +60,7 @@ class ChantViewModel : ViewModel() {
         if (_isAutoChanting.value) {
             startAutoChant()
         }
+        logAutoChant(_isAutoChanting.value)
     }
 
     private fun startAutoChant() {
@@ -71,6 +74,9 @@ class ChantViewModel : ViewModel() {
 
     fun incrementCount(isOnClicked : Boolean = false) {
         if(isOnClicked && _isAutoChanting.value) return
+        if(isOnClicked) {
+            logManualChant("incrementCount")
+        }
         viewModelScope.launch {
             if (_count.value == ONE_MALA_ROUND_COUNT) {
                 // Mala round is completed, reset count and log time
@@ -95,6 +101,7 @@ class ChantViewModel : ViewModel() {
                 val malaCompletedTime = System.currentTimeMillis() - startTime
                 totalTime += malaCompletedTime
                 _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime, totalTime)
+                logSampurnaMala(_malaNumber.value, (malaCompletedTime/60000))
             }
             // Increment the bead count
             oneBidTAT = System.currentTimeMillis()
@@ -106,6 +113,9 @@ class ChantViewModel : ViewModel() {
 
     fun decrementCount(isOnClicked : Boolean = false) {
         if(isOnClicked && _isAutoChanting.value) return
+        if(isOnClicked) {
+            logManualChant("decrementCount")
+        }
         if (_count.value > 0) {
             _count.value -= 1
         }
