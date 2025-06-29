@@ -7,7 +7,7 @@ import androidx.activity.viewModels
 import androidx.compose.ui.res.stringResource
 
 import com.malviya.mantra.R
-import com.malviya.mantra.screen.GreetingScreen
+import com.malviya.mantra.ui.screen.GreetingScreen
 import com.malviya.mantra.ui.theme.MantraTheme
 import timber.log.Timber
 

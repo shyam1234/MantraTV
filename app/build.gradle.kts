@@ -14,7 +14,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 15
-        versionName = "1.0.13"
+        versionName = "1.0.15"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,6 +31,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -41,7 +42,7 @@ android {
 }
 
 dependencies {
-
+    coreLibraryDesugaring( libs.desugar.jdk.libs)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -50,8 +51,22 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation (libs.timber)
+    implementation(libs.timber)
+
+    // Google Play Services
+    implementation(libs.play.services.base)
+    implementation(libs.play.services.auth)
+
+    // Firebase
     implementation(libs.firebase.analytics)
+    implementation(platform(libs.firebase.bom))
+//    implementation(libs.google.firebase.analytics)
+//    implementation(libs.firebase.database)
+//    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.remote.config)
+
+    // Image Loading
+    implementation(libs.coil.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

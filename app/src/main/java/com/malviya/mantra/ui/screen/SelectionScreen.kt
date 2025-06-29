@@ -1,6 +1,5 @@
-package com.malviya.mantra.screen
+package com.malviya.mantra.ui.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malviya.mantra.R
 import com.malviya.mantra.ui.ChantViewModel
+import com.malviya.mantra.ui.components.DynamicBackground
+import com.malviya.mantra.ui.components.GrayCircleWithNumber2
+import com.malviya.mantra.ui.components.MantraRender
+import com.malviya.mantra.ui.theme.textColorButton
+import com.malviya.mantra.ui.theme.textColorPowerBy
+import com.malviya.mantra.ui.theme.textColorSuggestion
 import java.util.Locale
 
 // Data class to hold mala number and time consumed
@@ -54,93 +59,94 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
     val oneBeadTimeForRendering by viewModel.oneBeadTimeForRendering.collectAsState()
     val malaNumber by viewModel.malaNumber.collectAsState()
 
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .verticalScroll(rememberScrollState()), // Enables vertical scrolling
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            MantraRender(name)
-
-            Spacer(modifier = Modifier.weight(1f)) // Takes up remaining space
-
-            if (chantLogs.isNotEmpty()) {
-                val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
-                Text(
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
-                    text = sampurnamalaFormat.format(chantLogs.last().malaNumber, totalTime),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }else{
-                Text(
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
-                    text = " ",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = suggestion,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 16.dp)
-            ) {
-                GrayCircleWithNumber2(count, color)
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                ButtonEvents(viewModel)
-            }
-        }
-
-        // Watermark text at the bottom center
+    DynamicBackground {
         Box(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 10.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()), // Enables vertical scrolling
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                MantraRender(name)
+
+                Spacer(modifier = Modifier.weight(1f)) // Takes up remaining space
+
+                if (chantLogs.isNotEmpty()) {
+                    val totalTime =
+                        viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
+                    Text(
+                        modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
+                        text = sampurnamalaFormat.format(chantLogs.last().malaNumber, totalTime),
+                        fontSize = 24.sp,
+                        color = textColorSuggestion,
+                        fontWeight = FontWeight.Bold
+                    )
+                } else {
+                    Text(
+                        modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
+                        text = " ",
+                        fontSize = 24.sp,
+                        color = textColorSuggestion,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
                 Text(
-                    text = poweredBy,
-                    color = Color.LightGray,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Light
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = suggestion,
+                    fontSize = 20.sp,
+                    color = textColorSuggestion,
+                    fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = "v$buildNumber",
-                    color = Color.LightGray,
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Light
-                )
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 16.dp)
+                ) {
+                    GrayCircleWithNumber2(count, color)
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    ButtonEvents(viewModel)
+                }
+            }
+
+            // Watermark text at the bottom center
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 10.dp)
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = poweredBy,
+                        color = textColorPowerBy,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                    Text(
+                        text = "v$buildNumber",
+                        color = textColorPowerBy,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                }
             }
         }
-
     }
-
 }
 
 @Composable
-private fun getChantFeedback(chantFeedback: ChantViewModel.ChantFeedback) : String {
+ fun getChantFeedback(chantFeedback: ChantViewModel.ChantFeedback) : String {
     return  when (chantFeedback) {
         is ChantViewModel.ChantFeedback.Begin -> stringResource(id = R.string.chant_feedback_begin)
         is ChantViewModel.ChantFeedback.VeryFast -> stringResource(id = R.string.chant_feedback_very_fast)
@@ -176,7 +182,7 @@ fun ButtonEvents(viewModel: ChantViewModel) {
         Button(onClick = {
             viewModel.decrementCount(true)
         }) {
-            Text(text = decrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+            Text(text = decrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold, color = textColorButton)
         }
 
         // Auto Chant Toggle Button
@@ -189,6 +195,7 @@ fun ButtonEvents(viewModel: ChantViewModel) {
             Text(
                 text = if (isAutoChanting) autoChantOnText else autoChantOffText,
                 fontSize = 24.sp,
+                color = if (isAutoChanting) Color.Black else textColorButton ,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -200,16 +207,13 @@ fun ButtonEvents(viewModel: ChantViewModel) {
             },
             modifier = Modifier.focusRequester(focusRequester)
         ) {
-            Text(text = incrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+            Text(text = incrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold,color = textColorButton)
         }
     }
 }
 
-
-
-
 @Composable
-private fun ChantLogItem(log: ChantLog) {
+ fun ChantLogItem(log: ChantLog) {
     Text(
         text = "Mala: ${log.malaNumber}, Time: ${
             String.format(Locale.US,

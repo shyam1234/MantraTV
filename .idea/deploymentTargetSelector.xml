@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="Mantra.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-12-01T12:59:36.372213Z">
+        <DropdownSelection timestamp="2025-06-21T19:26:41.897860Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/shreeganesha/.android/avd/Television_4K_API_34.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=R52W90JZQ4P" />
             </handle>
           </Target>
         </DropdownSelection>

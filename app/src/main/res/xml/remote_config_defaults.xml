@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- START xml_defaults -->
+<defaultsMap>
+    <entry>
+        <key>background_image_url</key>
+        <value>https://wallpapercat.com/w/full/b/5/4/19892-1920x1200-desktop-hd-sunrise-wallpaper-image.jpg</value>
+    </entry>
+    <entry>
+        <key>background_image_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>background_opacity</key>
+        <value>0.4</value>
+    </entry>
+</defaultsMap>
+    <!-- END xml_defaults -->

@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.malviya.mantra.firebase.logAutoChant
 import com.malviya.mantra.firebase.logManualChant
 import com.malviya.mantra.firebase.logSampurnaMala
-import com.malviya.mantra.screen.ChantLog
+import com.malviya.mantra.ui.screen.ChantLog
 import com.malviya.mantra.ui.theme.Yellow40
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Locale
 
-const val ONE_MALA_ROUND_COUNT: Int = 108
+const val ONE_MALA_ROUND_COUNT: Int = 10
 const val IDLE_TIME_FOR_ONE_BEAD: Long = 4800
 
 class ChantViewModel : ViewModel() {

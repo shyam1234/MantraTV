@@ -1,9 +1,8 @@
-package com.malviya.mantra.screen
+package com.malviya.mantra.ui.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malviya.mantra.ui.ONE_MALA_ROUND_COUNT
+import com.malviya.mantra.ui.theme.textColorMantra
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -30,7 +30,7 @@ fun MantraRender(name: String) {
         text = name,
         style = MaterialTheme.typography.titleLarge.copy(fontSize = 38.sp, lineHeight = 80.sp),
         textAlign = TextAlign.Center,
-        color = Color.Black,
+        color = textColorMantra,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
             .padding(4.dp)
