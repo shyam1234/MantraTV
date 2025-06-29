@@ -13,8 +13,8 @@ android {
         applicationId = "com.malviya.mantra"
         minSdk = 24
         targetSdk = 35
-        versionCode = 15
-        versionName = "1.0.15"
+        versionCode = 16
+        versionName = "1.0.16"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -54,8 +54,8 @@ dependencies {
     implementation(libs.timber)
 
     // Google Play Services
-    implementation(libs.play.services.base)
-    implementation(libs.play.services.auth)
+    //implementation(libs.play.services.base)
+    //implementation(libs.play.services.auth)
 
     // Firebase
     implementation(libs.firebase.analytics)
