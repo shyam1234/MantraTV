@@ -124,19 +124,19 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 10.dp)
+                    .padding(bottom = 1.dp)
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = poweredBy,
                         color = textColorPowerBy,
-                        fontSize = 10.sp,
+                        fontSize = 9.sp,
                         fontWeight = FontWeight.Light
                     )
                     Text(
                         text = "v$buildNumber",
                         color = textColorPowerBy,
-                        fontSize = 9.sp,
+                        fontSize = 8.sp,
                         fontWeight = FontWeight.Light
                     )
                 }
