@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,30 +20,36 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malviya.mantra.R
-import com.malviya.mantra.ui.ChantViewModel
+import com.malviya.mantra.ui.viewmodel.ChantViewModel
 import com.malviya.mantra.ui.components.DynamicBackground
+import com.malviya.mantra.ui.components.FlashMessage
 import com.malviya.mantra.ui.components.GrayCircleWithNumber2
 import com.malviya.mantra.ui.components.MantraRender
+import com.malviya.mantra.ui.theme.colorButtonGray
+import com.malviya.mantra.ui.theme.colorButtonGreen
 import com.malviya.mantra.ui.theme.textColorButton
 import com.malviya.mantra.ui.theme.textColorPowerBy
 import com.malviya.mantra.ui.theme.textColorSuggestion
+import com.malviya.mantra.ui.theme.textWhiteColorButton
 import java.util.Locale
 
 // Data class to hold mala number and time consumed
-data class ChantLog(val malaNumber: Int,
-                    val timeConsumed: Long,
-                    val totalTime : Long)
+data class ChantLog(
+    val malaNumber: Int,
+    val timeConsumed: Long,
+    val totalTime: Long
+)
 
 
 @Composable
-fun GreetingScreen(name : String, viewModel: ChantViewModel) {
+fun GreetingScreen(name: String, viewModel: ChantViewModel) {
+    val remoteConfigService by viewModel.remoteConfigService.collectAsState()
     val count by viewModel.count.collectAsState()
     val color by viewModel.color.collectAsState()
     val chantLogs by viewModel.chantLogs.collectAsState()
@@ -64,44 +69,62 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()), // Enables vertical scrolling
+            contentAlignment = Alignment.Center
         ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+            ) {
+                FlashMessage(remoteConfigService.getFlashMessage())
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.SpaceEvenly,
             ) {
                 MantraRender(name)
 
-                Spacer(modifier = Modifier.weight(1f)) // Takes up remaining space
+                //Mantra logs
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (chantLogs.isNotEmpty()) {
+                        val totalTime =
+                            viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
+                        Text(
+                            text = sampurnamalaFormat.format(
+                                chantLogs.last().malaNumber,
+                                totalTime
+                            ),
+                            Modifier.padding(2.dp),
+                            fontSize = 24.sp,
+                            color = textColorSuggestion,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Text(
+                            text = " ",
+                            Modifier.padding(2.dp),
+                            fontSize = 24.sp,
+                            color = textColorSuggestion,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
 
-                if (chantLogs.isNotEmpty()) {
-                    val totalTime =
-                        viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
                     Text(
-                        modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
-                        text = sampurnamalaFormat.format(chantLogs.last().malaNumber, totalTime),
-                        fontSize = 24.sp,
-                        color = textColorSuggestion,
-                        fontWeight = FontWeight.Bold
-                    )
-                } else {
-                    Text(
-                        modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
-                        text = " ",
-                        fontSize = 24.sp,
+                        text = suggestion,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(18.dp),
                         color = textColorSuggestion,
                         fontWeight = FontWeight.Bold
                     )
                 }
 
-                Text(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = suggestion,
-                    fontSize = 20.sp,
-                    color = textColorSuggestion,
-                    fontWeight = FontWeight.Bold
-                )
-
+                //--------------------------
+                //Mantra count circle
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
@@ -109,7 +132,8 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
                 ) {
                     GrayCircleWithNumber2(count, color)
                 }
-
+                //--------------------------
+                //Mantra buttons
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -120,34 +144,28 @@ fun GreetingScreen(name : String, viewModel: ChantViewModel) {
                 }
             }
 
+            //--------------------------
             // Watermark text at the bottom center
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 1.dp)
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = poweredBy,
-                        color = textColorPowerBy,
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Light
-                    )
-                    Text(
-                        text = "v$buildNumber",
-                        color = textColorPowerBy,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Light
-                    )
-                }
+                Text(
+                    text = "$poweredBy \t\t v$buildNumber",
+                    color = textColorPowerBy,
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.Light
+                )
             }
+            //--------------------------
         }
     }
 }
 
 @Composable
- fun getChantFeedback(chantFeedback: ChantViewModel.ChantFeedback) : String {
-    return  when (chantFeedback) {
+fun getChantFeedback(chantFeedback: ChantViewModel.ChantFeedback): String {
+    return when (chantFeedback) {
         is ChantViewModel.ChantFeedback.Begin -> stringResource(id = R.string.chant_feedback_begin)
         is ChantViewModel.ChantFeedback.VeryFast -> stringResource(id = R.string.chant_feedback_very_fast)
         is ChantViewModel.ChantFeedback.Fast -> stringResource(id = R.string.chant_feedback_fast)
@@ -179,23 +197,33 @@ fun ButtonEvents(viewModel: ChantViewModel) {
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Button(onClick = {
-            viewModel.decrementCount(true)
-        }) {
-            Text(text = decrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold, color = textColorButton)
+        Button(
+            onClick = {
+                viewModel.decrementCount(true)
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray
+            ),
+        ) {
+            Text(
+                text = decrementText,
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (!isAutoChanting) textWhiteColorButton else textColorButton,
+            )
         }
 
         // Auto Chant Toggle Button
         Button(
             onClick = { viewModel.toggleAutoChant() },
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (isAutoChanting) Color.Green else Color.Gray
+                containerColor = if (isAutoChanting) colorButtonGreen else colorButtonGray
             )
         ) {
             Text(
                 text = if (isAutoChanting) autoChantOnText else autoChantOffText,
                 fontSize = 24.sp,
-                color = if (isAutoChanting) Color.Black else textColorButton ,
+                color = if (isAutoChanting) textWhiteColorButton else textColorButton,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -205,18 +233,26 @@ fun ButtonEvents(viewModel: ChantViewModel) {
             onClick = {
                 viewModel.incrementCount(true)
             },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray
+            ),
             modifier = Modifier.focusRequester(focusRequester)
         ) {
-            Text(text = incrementText, fontSize = 34.sp, fontWeight = FontWeight.Bold,color = textColorButton)
+            Text(
+                text = incrementText,
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Bold,
+            )
         }
     }
 }
 
 @Composable
- fun ChantLogItem(log: ChantLog) {
+fun ChantLogItem(log: ChantLog) {
     Text(
         text = "Mala: ${log.malaNumber}, Time: ${
-            String.format(Locale.US,
+            String.format(
+                Locale.US,
                 "%.2f",
                 log.timeConsumed / (60 * 1000.0)
             )

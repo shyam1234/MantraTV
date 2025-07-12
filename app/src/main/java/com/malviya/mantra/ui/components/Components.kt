@@ -1,7 +1,10 @@
 package com.malviya.mantra.ui.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,10 +22,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.malviya.mantra.ui.ONE_MALA_ROUND_COUNT
+import com.malviya.mantra.ui.viewmodel.ONE_MALA_ROUND_COUNT
 import com.malviya.mantra.ui.theme.textColorMantra
 import kotlin.math.cos
 import kotlin.math.sin
+
 
 @Composable
 fun MantraRender(name: String) {
@@ -33,7 +37,7 @@ fun MantraRender(name: String) {
         color = textColorMantra,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
-            .padding(4.dp)
+            .padding(8.dp)
             .fillMaxWidth(1f)
     )
 }
@@ -113,6 +117,24 @@ fun GrayCircleWithNumber2(count: Int, color: Color) {
             }
         }
     }
+}
+
+@Composable
+fun FlashMessage(message: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .basicMarquee(iterations = Int.MAX_VALUE, animationMode = MarqueeAnimationMode.Immediately, velocity = 50.dp  )
+            .padding(10.dp),
+        contentAlignment = Alignment.TopCenter
+    ){
+        Text(message,
+            maxLines = 1,
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+    }
+
 }
 
 

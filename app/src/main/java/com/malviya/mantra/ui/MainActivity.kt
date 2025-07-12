@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import com.malviya.mantra.R
 import com.malviya.mantra.ui.screen.GreetingScreen
 import com.malviya.mantra.ui.theme.MantraTheme
+import com.malviya.mantra.ui.viewmodel.ChantViewModel
 import timber.log.Timber
 
 class MainActivity : ComponentActivity() {

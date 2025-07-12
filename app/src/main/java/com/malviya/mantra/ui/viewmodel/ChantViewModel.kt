@@ -1,13 +1,18 @@
-package com.malviya.mantra.ui
+package com.malviya.mantra.ui.viewmodel
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.malviya.mantra.firebase.RemoteConfigService
 import com.malviya.mantra.firebase.logAutoChant
 import com.malviya.mantra.firebase.logManualChant
 import com.malviya.mantra.firebase.logSampurnaMala
 import com.malviya.mantra.ui.screen.ChantLog
-import com.malviya.mantra.ui.theme.Yellow40
+import com.malviya.mantra.ui.theme.colorButtonGray
+import com.malviya.mantra.ui.theme.colorGreen
+import com.malviya.mantra.ui.theme.colorRed
+import com.malviya.mantra.ui.theme.colorYellow
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,13 +35,15 @@ class ChantViewModel : ViewModel() {
         object VerySlow : ChantFeedback()
     }
 
+    val remoteConfigService: StateFlow<RemoteConfigService> = MutableStateFlow(RemoteConfigService())
+
     private val _isAutoChanting = MutableStateFlow(false)
     val isAutoChanting: StateFlow<Boolean> = _isAutoChanting
 
     private val _chantFeedback = MutableStateFlow<ChantFeedback>(ChantFeedback.Begin)
     val chantFeedback: StateFlow<ChantFeedback> = _chantFeedback
 
-    private val _color = MutableStateFlow(Color.Gray)
+    private val _color = MutableStateFlow(colorButtonGray)
     val color: StateFlow<Color> = _color
 
     private val _chantLogs = MutableStateFlow<List<ChantLog>>(emptyList())
@@ -55,6 +62,8 @@ class ChantViewModel : ViewModel() {
     private var oneBidTAT = System.currentTimeMillis()
     private var totalTime = 0L
 
+    private var chantJob: Job? = null
+
     fun toggleAutoChant() {
         _isAutoChanting.value = !_isAutoChanting.value
         if (_isAutoChanting.value) {
@@ -63,8 +72,11 @@ class ChantViewModel : ViewModel() {
         logAutoChant(_isAutoChanting.value)
     }
 
+
     private fun startAutoChant() {
-        viewModelScope.launch {
+        oneBidTAT = System.currentTimeMillis()
+        chantJob?.cancel()
+        chantJob = viewModelScope.launch {
             while (_isAutoChanting.value) {
                 delay(IDLE_TIME_FOR_ONE_BEAD)
                 incrementCount()
@@ -83,29 +95,27 @@ class ChantViewModel : ViewModel() {
                 _count.value = 0
                 _color.value = Color.Gray
                 _chantFeedback.value = ChantFeedback.Begin
-            }
-
-            // Start time when count is 1 (first bead in mala)
-            if (_count.value == 0) {
-                startTime = System.currentTimeMillis()
-                _oneBeadTimeForRendering.value = IDLE_TIME_FOR_ONE_BEAD
-            } else {
-                _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
-            }
-
-            getCircleColor(_oneBeadTimeForRendering.asStateFlow().value)
-
-            if (_count.value == ONE_MALA_ROUND_COUNT-1) {
+                //---
                 // Calculate time taken for the current mala and log it
                 _malaNumber.value += 1
                 val malaCompletedTime = System.currentTimeMillis() - startTime
                 totalTime += malaCompletedTime
                 _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime, totalTime)
                 logSampurnaMala(_malaNumber.value, (malaCompletedTime/60000))
+            }else{
+                _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
+                // Increment the bead count
+                oneBidTAT = System.currentTimeMillis()
+                _count.value += 1
             }
-            // Increment the bead count
-            oneBidTAT = System.currentTimeMillis()
-            _count.value += 1
+
+            // Start time when count is 1 (first bead in mala)
+            if (_count.value == 0) {
+                startTime = System.currentTimeMillis()
+                _oneBeadTimeForRendering.value = IDLE_TIME_FOR_ONE_BEAD
+            }
+
+            getCircleColor(_oneBeadTimeForRendering.asStateFlow().value)
 
             Timber.d("one bead count: ${_count.value}, time: ${_oneBeadTimeForRendering.asStateFlow().value}")
         }
@@ -124,27 +134,27 @@ class ChantViewModel : ViewModel() {
     fun getCircleColor(timeConsumedForOneBid: Long){
         when(timeConsumedForOneBid){
             in 0..2999 -> {
-                _color.value = Color.Red
+                _color.value = colorRed
                 _chantFeedback.value = ChantFeedback.VeryFast
             }  // very fast
             in 3000..3500 -> {
-                _color.value = Color.Red
+                _color.value = colorRed
                 _chantFeedback.value = ChantFeedback.Fast
             }  // very fast
             in 3501..4900 -> {
-                _color.value = Color.Green
+                _color.value = colorGreen
                 _chantFeedback.value = ChantFeedback.Good
             }  // good
             in 4901..6000 -> {
-                _color.value = Yellow40
+                _color.value = colorYellow
                 _chantFeedback.value = ChantFeedback.SlowThanUsual
             }
             in 6001..8000 -> {
-                _color.value = Yellow40
+                _color.value = colorYellow
                 _chantFeedback.value = ChantFeedback.Slow
             }
             else -> {
-                _color.value = Yellow40
+                _color.value = colorYellow
                 _chantFeedback.value = ChantFeedback.VerySlow
             }   // very slow
         }
@@ -161,5 +171,15 @@ class ChantViewModel : ViewModel() {
             minutes > 0 -> String.format(Locale.US,"%02d:%02d", minutes, seconds)+" min" // Show minutes and seconds
             else -> String.format(Locale.US,"%02d", seconds)+" sec"  // Show only seconds
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopAutoChant()
+    }
+
+    fun stopAutoChant() {
+        chantJob?.cancel()
+        chantJob = null
     }
 }

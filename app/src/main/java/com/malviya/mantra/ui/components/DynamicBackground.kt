@@ -20,6 +20,7 @@ import com.malviya.mantra.firebase.RemoteConfigService
 import com.malviya.mantra.ui.theme.colorBackground
 import timber.log.Timber
 
+
 @Composable
 fun DynamicBackground(
     modifier: Modifier = Modifier,

@@ -45,4 +45,8 @@ class RemoteConfigService() {
     fun getBackgroundOpacity(): Float {
         return remoteConfig.getDouble("background_opacity").toFloat()
     }
+
+    fun getFlashMessage(): String {
+        return remoteConfig.getString("flash_message")
+    }
 } 
