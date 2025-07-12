@@ -125,13 +125,13 @@ fun FlashMessage(message: String) {
         modifier = Modifier
             .fillMaxWidth()
             .basicMarquee(iterations = Int.MAX_VALUE, animationMode = MarqueeAnimationMode.Immediately, velocity = 50.dp  )
-            .padding(10.dp),
+            .padding(8.dp),
         contentAlignment = Alignment.TopCenter
     ){
         Text(message,
             maxLines = 1,
             color = Color.White,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold)
     }
 
