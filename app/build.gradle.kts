@@ -74,4 +74,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // For JUnit 4
+    testImplementation(libs.junit)
+
+// For Kotlin coroutines testing
+    testImplementation(libs.kotlinx.coroutines.test)
+
+// For StateFlow testing (Turbine is optional, but useful)
+    testImplementation(libs.turbine)
 }
