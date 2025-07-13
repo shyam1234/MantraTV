@@ -12,4 +12,7 @@
     <string name="chant_feedback_very_slow">You are chanting very slow!</string>
     <string name="auto_chant_on">Auto Chant On</string>
     <string name="auto_chant_off">Auto Chant Off</string>
+    <string name="choose_screen">स्क्रीन चुनें</string>
+    <string name="counter_screen">काउंटर स्क्रीन</string>
+    <string name="mala_screen">माला स्क्रीन</string>
 </resources>

@@ -9,4 +9,10 @@
     <string name="chant_feedback_slow_than_usual">¡Estás cantando un poco más lento de lo habitual!</string>
     <string name="chant_feedback_slow">¡Estás cantando lento!</string>
     <string name="chant_feedback_very_slow">¡Estás cantando muy lento!</string>
+    <string name="auto_chant_on">ऑटो जाप चालू</string>
+    <string name="auto_chant_off">ऑटो जाप बंद</string>
+    <string name="choose_screen">स्क्रीन चुनें</string>
+    <string name="counter_screen">काउंटर स्क्रीन</string>
+    <string name="mala_screen">माला स्क्रीन</string>
+
 </resources>
