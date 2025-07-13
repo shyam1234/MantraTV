@@ -28,6 +28,14 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
+/**
+ * Renders the main mantra text with proper styling
+ * 
+ * @param name The mantra text to display
+ * 
+ * Displays the mantra in large, bold text with proper spacing and alignment.
+ * Uses the theme's mantra color for consistent branding.
+ */
 @Composable
 fun MantraRender(name: String) {
     Text(
@@ -45,6 +53,15 @@ fun MantraRender(name: String) {
     )
 }
 
+/**
+ * Simple circular counter display
+ * 
+ * @param number The number to display in the center
+ * @param color The background color of the circle
+ * 
+ * Displays a number in a circular container with the specified background color.
+ * Used for basic counter visualization.
+ */
 @Composable
 fun GrayCircleWithNumber(number: Int, color: Color) {
     Box(
@@ -65,11 +82,22 @@ fun GrayCircleWithNumber(number: Int, color: Color) {
 }
 
 
+/**
+ * Advanced circular counter with bead indicators
+ * 
+ * @param count The current bead count (0-108)
+ * @param color The color for the current bead and main circle
+ * 
+ * Displays a main circle with the count in the center, surrounded by small circles
+ * representing each bead in the mala. Completed beads show their respective colors,
+ * providing visual feedback of progress through the mala round.
+ */
 @Composable
 fun GrayCircleWithNumber2(count: Int, color: Color) {
-    // State to keep track of the colors for each circle
+    // State to keep track of the colors for each bead circle
     var circleColors by remember { mutableStateOf(MutableList(AppConstants.ONE_MALA_ROUND_COUNT) { Color.Transparent }) }
-    // Check if count is 0 and reset circleColors
+    
+    // Reset bead colors when count reaches 0 (new mala round)
     LaunchedEffect(count) {
         if (count == 0) {
             circleColors = MutableList(AppConstants.ONE_MALA_ROUND_COUNT) { Color.Transparent }
@@ -82,7 +110,7 @@ fun GrayCircleWithNumber2(count: Int, color: Color) {
     }
 
     Box(contentAlignment = Alignment.Center) {
-        // Main circle with the count
+        // Main circle with the count in center
         Canvas(modifier = Modifier.size(AppConstants.Dimensions.CIRCLE_MAIN_SIZE)) {
             drawCircle(
                 color = color,
@@ -91,6 +119,7 @@ fun GrayCircleWithNumber2(count: Int, color: Color) {
             )
         }
 
+        // Display current count in center
         Text(
             text = "$count",
             fontSize = AppConstants.Typography.FONT_SIZE_COUNTER,
@@ -104,7 +133,7 @@ fun GrayCircleWithNumber2(count: Int, color: Color) {
             val circleRadius = AppConstants.Dimensions.SMALL_CIRCLE_RADIUS.toPx()
             val bigCircleRadius = size.minDimension * AppConstants.Layout.CIRCLE_RADIUS_FACTOR - circleRadius
 
-            // Draw circles based on the count
+            // Draw bead indicator circles based on the count
             for (i in 0 until count.coerceAtMost(AppConstants.ONE_MALA_ROUND_COUNT)) {
                 if (count > 0) {
                     val angle = (i * 2 * Math.PI / AppConstants.ONE_MALA_ROUND_COUNT).toFloat()
@@ -121,6 +150,14 @@ fun GrayCircleWithNumber2(count: Int, color: Color) {
     }
 }
 
+/**
+ * Displays a scrolling flash message at the top of the screen
+ * 
+ * @param message The message text to display
+ * 
+ * Shows important announcements or notifications in a marquee-style scrolling text.
+ * Uses infinite scrolling animation with configurable speed and styling.
+ */
 @Composable
 fun FlashMessage(message: String) {
     Box(

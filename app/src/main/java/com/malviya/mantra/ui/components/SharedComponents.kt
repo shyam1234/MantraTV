@@ -33,6 +33,19 @@ import com.malviya.mantra.ui.theme.textColorSuggestion
 import com.malviya.mantra.ui.theme.textWhiteColorButton
 import com.malviya.mantra.ui.viewmodel.ChantViewModel
 
+/**
+ * Main layout wrapper for mantra screens (counter and mala)
+ * 
+ * @param name The mantra text to display
+ * @param viewModel The ChantViewModel for state management
+ * @param flashMessage The message to display in the flash banner
+ * @param centerContent The main content to display in the center (counter or mala)
+ * @param onIncrement Callback for increment button
+ * @param onDecrement Callback for decrement button
+ * 
+ * Provides a consistent layout structure for both counter and mala screens,
+ * including mantra display, logs, buttons, and watermark.
+ */
 @Composable
 fun MantraScreenLayout(
     name: String,
@@ -106,6 +119,17 @@ fun MantraScreenLayout(
     }
 }
 
+/**
+ * Displays mantra logs and feedback section
+ * 
+ * @param chantLogs List of completed mala rounds with timing
+ * @param sampurnamalaFormat Formatted string for displaying mala completion info
+ * @param suggestion Current chant speed feedback message
+ * @param viewModel ChantViewModel for time conversion utilities
+ * 
+ * Shows the last completed mala information and current chanting feedback.
+ * Displays empty space if no malas have been completed yet.
+ */
 @Composable
 private fun MantraLogsSection(
     chantLogs: List<ChantLog>,
@@ -151,6 +175,16 @@ private fun MantraLogsSection(
                 }
 }
 
+/**
+ * Displays the control buttons for mantra chanting
+ * 
+ * @param viewModel ChantViewModel for state management
+ * @param onIncrement Callback for increment button press
+ * @param onDecrement Callback for decrement button press
+ * 
+ * Shows three buttons: decrement (-1), auto-chant toggle, and increment (+1).
+ * Button colors change based on auto-chant state to provide visual feedback.
+ */
 @Composable
 private fun MantraButtonsSection(
     viewModel: ChantViewModel,
@@ -213,6 +247,15 @@ private fun MantraButtonsSection(
     }
 }
 
+/**
+ * Converts chant feedback state to localized string
+ * 
+ * @param chantFeedback The current chant speed feedback state
+ * @return Localized string message for the feedback state
+ * 
+ * Maps the ChantFeedback enum to appropriate localized string resources
+ * for displaying user feedback about chanting speed.
+ */
 @Composable
 private fun getChantFeedback(chantFeedback: ChantViewModel.ChantFeedback): String {
     return when (chantFeedback) {
