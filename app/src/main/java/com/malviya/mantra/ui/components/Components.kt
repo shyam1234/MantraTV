@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.malviya.mantra.ui.viewmodel.ONE_MALA_ROUND_COUNT
+import com.malviya.mantra.ui.constants.AppConstants
 import com.malviya.mantra.ui.theme.textColorMantra
 import kotlin.math.cos
 import kotlin.math.sin
@@ -32,13 +32,16 @@ import kotlin.math.sin
 fun MantraRender(name: String) {
     Text(
         text = name,
-        style = MaterialTheme.typography.titleLarge.copy(fontSize = 38.sp, lineHeight = 80.sp),
+        style = MaterialTheme.typography.titleLarge.copy(
+            fontSize = AppConstants.Typography.FONT_SIZE_XXXLARGE, 
+            lineHeight = AppConstants.Typography.LINE_HEIGHT_MANTRA
+        ),
         textAlign = TextAlign.Center,
         color = textColorMantra,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(1f)
+            .padding(AppConstants.Dimensions.SPACING_MEDIUM)
+            .fillMaxWidth(AppConstants.Layout.FILL_MAX_WIDTH)
     )
 }
 
@@ -46,17 +49,17 @@ fun MantraRender(name: String) {
 fun GrayCircleWithNumber(number: Int, color: Color) {
     Box(
         modifier = Modifier
-            .padding(10.dp)
-            .size(140.dp) // Adjust size as needed
-            .background(color, shape = CircleShape), contentAlignment = Alignment.Center
-
+            .padding(AppConstants.Dimensions.SPACING_LARGE)
+            .size(AppConstants.Dimensions.CIRCLE_MAIN_SIZE)
+            .background(color, shape = CircleShape), 
+        contentAlignment = Alignment.Center
     ) {
         Text(
             fontWeight = FontWeight.Bold,
-            fontSize = 44.sp,
+            fontSize = AppConstants.Typography.FONT_SIZE_COUNTER,
             text = number.toString(),
             color = Color.White,
-            style = MaterialTheme.typography.bodyLarge // Adjust text style as needed
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 }
@@ -65,11 +68,11 @@ fun GrayCircleWithNumber(number: Int, color: Color) {
 @Composable
 fun GrayCircleWithNumber2(count: Int, color: Color) {
     // State to keep track of the colors for each circle
-    var circleColors by remember { mutableStateOf(MutableList(ONE_MALA_ROUND_COUNT) { Color.Transparent }) }
+    var circleColors by remember { mutableStateOf(MutableList(AppConstants.ONE_MALA_ROUND_COUNT) { Color.Transparent }) }
     // Check if count is 0 and reset circleColors
     LaunchedEffect(count) {
         if (count == 0) {
-            circleColors = MutableList(ONE_MALA_ROUND_COUNT) { Color.Transparent }
+            circleColors = MutableList(AppConstants.ONE_MALA_ROUND_COUNT) { Color.Transparent }
         }
     }
 
@@ -80,34 +83,33 @@ fun GrayCircleWithNumber2(count: Int, color: Color) {
 
     Box(contentAlignment = Alignment.Center) {
         // Main circle with the count
-        Canvas(modifier = Modifier.size(140.dp)) {
+        Canvas(modifier = Modifier.size(AppConstants.Dimensions.CIRCLE_MAIN_SIZE)) {
             drawCircle(
                 color = color,
-                radius = size.minDimension / 2,
-                center = Offset(size.width / 2, size.height / 2)
+                radius = size.minDimension * AppConstants.Layout.CIRCLE_RADIUS_FACTOR,
+                center = Offset(size.width * AppConstants.Layout.CENTER_ALIGNMENT, size.height * AppConstants.Layout.CENTER_ALIGNMENT)
             )
         }
 
         Text(
             text = "$count",
-            fontSize = 44.sp,
+            fontSize = AppConstants.Typography.FONT_SIZE_COUNTER,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             style = MaterialTheme.typography.bodyLarge
         )
 
         // Small colored circles forming a border around the main circle
-        Canvas(modifier = Modifier.size(150.dp)) {
-            val circleRadius = 3f  // Radius of each small circle
-            val bigCircleRadius =
-                size.minDimension / 2 - circleRadius  // Adjusted radius for positioning
+        Canvas(modifier = Modifier.size(AppConstants.Dimensions.CIRCLE_BORDER_SIZE)) {
+            val circleRadius = AppConstants.Dimensions.SMALL_CIRCLE_RADIUS.toPx()
+            val bigCircleRadius = size.minDimension * AppConstants.Layout.CIRCLE_RADIUS_FACTOR - circleRadius
 
             // Draw circles based on the count
-            for (i in 0 until count.coerceAtMost(ONE_MALA_ROUND_COUNT)) {
+            for (i in 0 until count.coerceAtMost(AppConstants.ONE_MALA_ROUND_COUNT)) {
                 if (count > 0) {
-                    val angle = (i * 2 * Math.PI / ONE_MALA_ROUND_COUNT).toFloat()
-                    val x = bigCircleRadius * cos(angle) + size.width / 2
-                    val y = bigCircleRadius * sin(angle) + size.height / 2
+                    val angle = (i * 2 * Math.PI / AppConstants.ONE_MALA_ROUND_COUNT).toFloat()
+                    val x = bigCircleRadius * cos(angle) + size.width * AppConstants.Layout.CENTER_ALIGNMENT
+                    val y = bigCircleRadius * sin(angle) + size.height * AppConstants.Layout.CENTER_ALIGNMENT
                     drawCircle(
                         color = circleColors[i],
                         radius = circleRadius,
@@ -124,17 +126,22 @@ fun FlashMessage(message: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .basicMarquee(iterations = Int.MAX_VALUE, animationMode = MarqueeAnimationMode.Immediately, velocity = 50.dp  )
-            .padding(8.dp),
+            .basicMarquee(
+                iterations = AppConstants.MARQUEE_ITERATIONS, 
+                animationMode = MarqueeAnimationMode.Immediately, 
+                velocity = AppConstants.MARQUEE_VELOCITY.dp
+            )
+            .padding(AppConstants.Dimensions.SPACING_MEDIUM),
         contentAlignment = Alignment.TopCenter
     ){
-        Text(message,
-            maxLines = 1,
+        Text(
+            message,
+            maxLines = AppConstants.UI.MAX_LINES_FLASH_MESSAGE,
             color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold)
+            fontSize = AppConstants.Typography.FONT_SIZE_SMALL,
+            fontWeight = FontWeight.Bold
+        )
     }
-
 }
 
 

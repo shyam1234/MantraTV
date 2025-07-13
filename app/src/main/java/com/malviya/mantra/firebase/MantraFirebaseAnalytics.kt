@@ -4,17 +4,18 @@ import android.os.Build
 import android.os.Bundle
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
+import com.malviya.mantra.ui.constants.AppConstants
 
 
 object FirebaseEvent {
-    const val EVENT_AUTO_CHANT = "auto_chant"
-    const val EVENT_MANUAL_CHANT = "manual_chant"
-    const val EVENT_SAMPURNA_MALA= "sampurna_mala"
-    const val KEY_AUTO_CHANT_ENABLED = "auto_chant_enabled"
-    const val KEY_MANUAL_CHANT_TYPE = "manual_chant_type"
-    const val KEY_MALA_NUMBER = "mala_number"
-    const val KEY_TIME_TAKEN = "time_taken"
-    const val KEY_DEVICE_MODEL = "device_model"
+    const val EVENT_AUTO_CHANT = AppConstants.EVENT_AUTO_CHANT
+    const val EVENT_MANUAL_CHANT = AppConstants.EVENT_MANUAL_CHANT
+    const val EVENT_SAMPURNA_MALA = AppConstants.EVENT_SAMPURNA_MALA
+    const val KEY_AUTO_CHANT_ENABLED = AppConstants.KEY_AUTO_CHANT_ENABLED
+    const val KEY_MANUAL_CHANT_TYPE = AppConstants.KEY_MANUAL_CHANT_TYPE
+    const val KEY_MALA_NUMBER = AppConstants.KEY_MALA_NUMBER
+    const val KEY_TIME_TAKEN = AppConstants.KEY_TIME_TAKEN
+    const val KEY_DEVICE_MODEL = AppConstants.KEY_DEVICE_MODEL
 }
 
 fun logAutoChant(isAutoChantEnabled: Boolean){

@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malviya.mantra.R
+import com.malviya.mantra.ui.constants.AppConstants
 import com.malviya.mantra.ui.screen.ChantLog
 import com.malviya.mantra.ui.theme.colorButtonGray
 import com.malviya.mantra.ui.theme.colorButtonGreen
@@ -75,7 +76,7 @@ fun MantraScreenLayout(
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(bottom = 16.dp)
+                        .padding(bottom = AppConstants.Dimensions.SPACING_XLARGE)
                 ) {
                     centerContent()
                 }
@@ -92,12 +93,12 @@ fun MantraScreenLayout(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 1.dp)
+                    .padding(bottom = AppConstants.Dimensions.SPACING_TINY)
             ) {
                 Text(
-                    text = "$poweredBy \t\t v$buildNumber",
+                    text = "$poweredBy ${AppConstants.UI.WATERMARK_SEPARATOR} ${AppConstants.UI.WATERMARK_PREFIX}$buildNumber",
                     color = textColorPowerBy,
-                    fontSize = 8.sp,
+                    fontSize = AppConstants.Typography.FONT_SIZE_TINY,
                     fontWeight = FontWeight.Light
                 )
             }
@@ -112,42 +113,42 @@ private fun MantraLogsSection(
     suggestion: String,
     viewModel: ChantViewModel
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (chantLogs.isNotEmpty()) {
-            val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
-            Text(
-                text = sampurnamalaFormat.format(
-                    chantLogs.last().malaNumber,
-                    totalTime
-                ),
-                Modifier.padding(2.dp),
-                fontSize = 24.sp,
-                color = textColorSuggestion,
-                fontWeight = FontWeight.Bold
-            )
-        } else {
-            Text(
-                text = " ",
-                Modifier.padding(2.dp),
-                fontSize = 24.sp,
-                color = textColorSuggestion,
-                fontWeight = FontWeight.Bold
-            )
-        }
+                    Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(AppConstants.Dimensions.SPACING_MEDIUM),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (chantLogs.isNotEmpty()) {
+                        val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
+                        Text(
+                            text = sampurnamalaFormat.format(
+                                chantLogs.last().malaNumber,
+                                totalTime
+                            ),
+                            Modifier.padding(AppConstants.Dimensions.SPACING_SMALL),
+                            fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
+                            color = textColorSuggestion,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Text(
+                            text = " ",
+                            Modifier.padding(AppConstants.Dimensions.SPACING_SMALL),
+                            fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
+                            color = textColorSuggestion,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
 
-        Text(
-            text = suggestion,
-            fontSize = 20.sp,
-            modifier = Modifier.padding(18.dp),
-            color = textColorSuggestion,
-            fontWeight = FontWeight.Bold
-        )
-    }
+                    Text(
+                        text = suggestion,
+                        fontSize = AppConstants.Typography.FONT_SIZE_MEDIUM,
+                        modifier = Modifier.padding(AppConstants.Dimensions.SPACING_XXLARGE),
+                        color = textColorSuggestion,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 }
 
 @Composable
@@ -165,7 +166,7 @@ private fun MantraButtonsSection(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(AppConstants.Dimensions.SPACING_XLARGE),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Button(
@@ -176,7 +177,7 @@ private fun MantraButtonsSection(
         ) {
             Text(
                 text = decrementText,
-                fontSize = 34.sp,
+                fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
                 fontWeight = FontWeight.Bold,
                 color = if (!isAutoChanting) textWhiteColorButton else textColorButton,
             )
@@ -191,7 +192,7 @@ private fun MantraButtonsSection(
         ) {
             Text(
                 text = if (isAutoChanting) autoChantOnText else autoChantOffText,
-                fontSize = 24.sp,
+                fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
                 color = if (isAutoChanting) textWhiteColorButton else textColorButton,
                 fontWeight = FontWeight.Bold
             )
@@ -205,7 +206,7 @@ private fun MantraButtonsSection(
         ) {
             Text(
                 text = incrementText,
-                fontSize = 34.sp,
+                fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
                 fontWeight = FontWeight.Bold,
             )
         }

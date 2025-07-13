@@ -12,6 +12,7 @@ import com.malviya.mantra.ui.theme.colorButtonGray
 import com.malviya.mantra.ui.theme.colorGreen
 import com.malviya.mantra.ui.theme.colorRed
 import com.malviya.mantra.ui.theme.colorYellow
+import com.malviya.mantra.ui.constants.AppConstants
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,9 +21,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Locale
-
-const val ONE_MALA_ROUND_COUNT: Int = 108
-const val IDLE_TIME_FOR_ONE_BEAD: Long = 4800
 
 class ChantViewModel : ViewModel() {
     sealed class ChantFeedback {
@@ -78,7 +76,7 @@ class ChantViewModel : ViewModel() {
         chantJob?.cancel()
         chantJob = viewModelScope.launch {
             while (_isAutoChanting.value) {
-                delay(IDLE_TIME_FOR_ONE_BEAD)
+                delay(AppConstants.IDLE_TIME_FOR_ONE_BEAD)
                 incrementCount()
             }
         }
@@ -90,7 +88,7 @@ class ChantViewModel : ViewModel() {
             logManualChant("incrementCount")
         }
         viewModelScope.launch {
-            if (_count.value == ONE_MALA_ROUND_COUNT) {
+            if (_count.value == AppConstants.ONE_MALA_ROUND_COUNT) {
                 // Mala round is completed, reset count and log time
                 _count.value = 0
                 _color.value = Color.Gray
@@ -101,7 +99,7 @@ class ChantViewModel : ViewModel() {
                 val malaCompletedTime = System.currentTimeMillis() - startTime
                 totalTime += malaCompletedTime
                 _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime, totalTime)
-                logSampurnaMala(_malaNumber.value, (malaCompletedTime/60000))
+                logSampurnaMala(_malaNumber.value, (malaCompletedTime/AppConstants.TimeFormat.MILLISECONDS_IN_MINUTE))
             }else{
                 _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
                 // Increment the bead count
@@ -112,7 +110,7 @@ class ChantViewModel : ViewModel() {
             // Start time when count is 1 (first bead in mala)
             if (_count.value == 0) {
                 startTime = System.currentTimeMillis()
-                _oneBeadTimeForRendering.value = IDLE_TIME_FOR_ONE_BEAD
+                _oneBeadTimeForRendering.value = AppConstants.IDLE_TIME_FOR_ONE_BEAD
             }
 
             getCircleColor(_oneBeadTimeForRendering.asStateFlow().value)
@@ -133,23 +131,23 @@ class ChantViewModel : ViewModel() {
 
     fun getCircleColor(timeConsumedForOneBid: Long){
         when(timeConsumedForOneBid){
-            in 0..2999 -> {
+            in 0..AppConstants.VERY_FAST_THRESHOLD -> {
                 _color.value = colorRed
                 _chantFeedback.value = ChantFeedback.VeryFast
             }  // very fast
-            in 3000..3500 -> {
+            in (AppConstants.VERY_FAST_THRESHOLD + 1)..AppConstants.FAST_THRESHOLD -> {
                 _color.value = colorRed
                 _chantFeedback.value = ChantFeedback.Fast
-            }  // very fast
-            in 3501..4900 -> {
+            }  // fast
+            in (AppConstants.FAST_THRESHOLD + 1)..AppConstants.GOOD_THRESHOLD -> {
                 _color.value = colorGreen
                 _chantFeedback.value = ChantFeedback.Good
             }  // good
-            in 4901..6000 -> {
+            in (AppConstants.GOOD_THRESHOLD + 1)..AppConstants.SLOW_THAN_USUAL_THRESHOLD -> {
                 _color.value = colorYellow
                 _chantFeedback.value = ChantFeedback.SlowThanUsual
             }
-            in 6001..8000 -> {
+            in (AppConstants.SLOW_THAN_USUAL_THRESHOLD + 1)..AppConstants.SLOW_THRESHOLD -> {
                 _color.value = colorYellow
                 _chantFeedback.value = ChantFeedback.Slow
             }
@@ -161,15 +159,15 @@ class ChantViewModel : ViewModel() {
     }
 
     fun convertMillisToReadableTime(milliseconds: Long): String {
-        val totalSeconds = milliseconds / 1000
-        val hours = totalSeconds / 3600
-        val minutes = (totalSeconds % 3600) / 60
-        val seconds = totalSeconds % 60
+        val totalSeconds = milliseconds / AppConstants.TimeFormat.MILLISECONDS_IN_SECOND
+        val hours = totalSeconds / AppConstants.TimeFormat.SECONDS_IN_HOUR
+        val minutes = (totalSeconds % AppConstants.TimeFormat.SECONDS_IN_HOUR) / AppConstants.TimeFormat.SECONDS_IN_MINUTE
+        val seconds = totalSeconds % AppConstants.TimeFormat.SECONDS_IN_MINUTE
 
         return when {
-            hours > 0 -> String.format(Locale.US,"%02d:%02d:%02d", hours, minutes, seconds)+" hr"  // Show hours, minutes, and seconds
-            minutes > 0 -> String.format(Locale.US,"%02d:%02d", minutes, seconds)+" min" // Show minutes and seconds
-            else -> String.format(Locale.US,"%02d", seconds)+" sec"  // Show only seconds
+            hours > 0 -> String.format(Locale.US, AppConstants.TimeFormat.TIME_FORMAT_HOURS, hours, minutes, seconds) + AppConstants.TimeFormat.SUFFIX_HOURS
+            minutes > 0 -> String.format(Locale.US, AppConstants.TimeFormat.TIME_FORMAT_MINUTES, minutes, seconds) + AppConstants.TimeFormat.SUFFIX_MINUTES
+            else -> String.format(Locale.US, AppConstants.TimeFormat.TIME_FORMAT_SECONDS, seconds) + AppConstants.TimeFormat.SUFFIX_SECONDS
         }
     }
 
