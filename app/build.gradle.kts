@@ -64,6 +64,8 @@ dependencies {
 //    implementation(libs.firebase.database)
 //    implementation(libs.firebase.firestore)
     implementation(libs.firebase.remote.config)
+    implementation (libs.androidx.constraintlayout.compose)
+
 
     // Image Loading
     implementation(libs.coil.compose)

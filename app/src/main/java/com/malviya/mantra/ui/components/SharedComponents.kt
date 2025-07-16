@@ -1,12 +1,16 @@
 package com.malviya.mantra.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -17,11 +21,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.malviya.mantra.R
 import com.malviya.mantra.ui.constants.AppConstants
 import com.malviya.mantra.ui.screen.ChantLog
@@ -35,14 +42,14 @@ import com.malviya.mantra.ui.viewmodel.ChantViewModel
 
 /**
  * Main layout wrapper for mantra screens (counter and mala)
- * 
+ *
  * @param name The mantra text to display
  * @param viewModel The ChantViewModel for state management
  * @param flashMessage The message to display in the flash banner
  * @param centerContent The main content to display in the center (counter or mala)
  * @param onIncrement Callback for increment button
  * @param onDecrement Callback for decrement button
- * 
+ *
  * Provides a consistent layout structure for both counter and mala screens,
  * including mantra display, logs, buttons, and watermark.
  */
@@ -63,46 +70,199 @@ fun MantraScreenLayout(
     val chantFeedback by viewModel.chantFeedback.collectAsState()
     val suggestion = getChantFeedback(chantFeedback)
 
-    DynamicBackground {
-        Box(
+    /*DynamicBackground {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            contentAlignment = Alignment.Center
+                .verticalScroll(rememberScrollState())
+                .padding(AppConstants.Dimensions.SPACING_LARGE)
         ) {
-            Box(
-                modifier = Modifier.align(Alignment.TopCenter)
-            ) {
-                FlashMessage(flashMessage)
-            }
-            
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceEvenly,
-            ) {
-                MantraRender(name)
 
-                // Mantra logs
-                MantraLogsSection(chantLogs, sampurnamalaFormat, suggestion, viewModel)
+            ConstraintLayout(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
 
+                // Constraint references
+                val (topRef, mid1Ref, mid2Ref, mid3Ref,mid4Ref, bottomRef) = createRefs()
+                //-TOP-----------------------
+                Box(
+                    modifier = Modifier
+                        .constrainAs(topRef) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .fillMaxSize()
+                ) {
+                    FlashMessage(flashMessage)
+                }
+                //--MIDDLE 1---------------------
+                Box(
+                    modifier = Modifier
+                        .constrainAs(mid1Ref) {
+                            top.linkTo(topRef.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }) {
+                    MantraRender(name)
+                }
+                //-MIDDLE 2---------------------
+                Box(
+                    modifier = Modifier
+                        .constrainAs(mid2Ref) {
+                            top.linkTo(mid1Ref.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }) {
+                    // Mantra logs
+                    MantraLogsSection(chantLogs, sampurnamalaFormat, suggestion, viewModel)
+                }
+                //-MIDDLE 3---------------------
                 // Center content (counter circle or mala visualization)
                 Box(
                     modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
+                        .constrainAs(mid3Ref) {
+                            top.linkTo(mid2Ref.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
                         .padding(bottom = AppConstants.Dimensions.SPACING_XLARGE)
                 ) {
                     centerContent()
                 }
+                //-MIDDLE 4---------------------
+                Box(
+                    modifier = Modifier
+                        .constrainAs(mid4Ref) {
+                            top.linkTo(mid3Ref.bottom)
+                            bottom.linkTo(bottomRef.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .padding(bottom = AppConstants.Dimensions.SPACING_XLARGE)
+                ) {
+                    // Mantra buttons
+                    MantraButtonsSection(
+                        viewModel = viewModel,
+                        onIncrement = onIncrement,
+                        onDecrement = onDecrement
+                    )
+                }
+                //-BOTTOM ---------------------
+                Box(
+                    modifier = Modifier
+                        .constrainAs(mid4Ref) {
+                            top.linkTo(parent.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .padding(bottom = AppConstants.Dimensions.SPACING_TINY)
+                ) {
+                    // Watermark text at the bottom center
+                    Text(
+                        text = "$poweredBy ${AppConstants.UI.WATERMARK_SEPARATOR} ${AppConstants.UI.WATERMARK_PREFIX}$buildNumber",
+                        color = textColorPowerBy,
+                        fontSize = AppConstants.Typography.FONT_SIZE_TINY,
+                        fontWeight = FontWeight.Light
+                    )
+                }
+            }
+        }
+    }*/
+    DynamicBackground {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
 
-                // Mantra buttons
-                MantraButtonsSection(
-                    viewModel = viewModel,
-                    onIncrement = onIncrement,
-                    onDecrement = onDecrement
-                )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(bottom = AppConstants.Dimensions.SPACING_TINY)
+            ) {
+                FlashMessage(flashMessage)
             }
 
-            // Watermark text at the bottom center
+            Box(modifier = Modifier
+                .align(Alignment.Center)){
+                // Scrollable content
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            start = AppConstants.Dimensions.SPACING_LARGE,
+                            end = AppConstants.Dimensions.SPACING_LARGE,
+                            top = AppConstants.Dimensions.SPACING_XXLARGE,
+                            bottom = AppConstants.Dimensions.SPACING_XXLARGE // 👈 leave space for bottom text
+                        )
+                ) {
+                    ConstraintLayout(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                    ) {
+                        val (mid1Ref, mid2Ref, mid3Ref, mid4Ref) = createRefs()
+
+
+                        // Middle 1
+                        Box(
+                            modifier = Modifier
+                                .constrainAs(mid1Ref) {
+                                    top.linkTo(parent.top)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                }
+                        ) {
+                            MantraRender(name)
+                        }
+
+                        // Middle 2
+                        Box(
+                            modifier = Modifier
+                                .constrainAs(mid2Ref) {
+                                    top.linkTo(mid1Ref.bottom)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                }
+                        ) {
+                            MantraLogsSection(chantLogs, sampurnamalaFormat, suggestion, viewModel)
+                        }
+
+                        // Middle 3
+                        Box(
+                            modifier = Modifier
+                                .constrainAs(mid3Ref) {
+                                    top.linkTo(mid2Ref.bottom)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                }
+                                .padding(bottom = AppConstants.Dimensions.SPACING_XLARGE)
+                        ) {
+                            centerContent()
+                        }
+
+                        // Middle 4 (Mantra Buttons)
+                        Box(
+                            modifier = Modifier
+                                .constrainAs(mid4Ref) {
+                                    top.linkTo(mid3Ref.bottom)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                }
+                                .padding(bottom = AppConstants.Dimensions.SPACING_XLARGE)
+                        ) {
+                            MantraButtonsSection(
+                                viewModel = viewModel,
+                                onIncrement = onIncrement,
+                                onDecrement = onDecrement
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Fixed bottom watermark (pinned to screen bottom)
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -117,16 +277,18 @@ fun MantraScreenLayout(
             }
         }
     }
+
+
 }
 
 /**
  * Displays mantra logs and feedback section
- * 
+ *
  * @param chantLogs List of completed mala rounds with timing
  * @param sampurnamalaFormat Formatted string for displaying mala completion info
  * @param suggestion Current chant speed feedback message
  * @param viewModel ChantViewModel for time conversion utilities
- * 
+ *
  * Shows the last completed mala information and current chanting feedback.
  * Displays empty space if no malas have been completed yet.
  */
@@ -137,51 +299,51 @@ private fun MantraLogsSection(
     suggestion: String,
     viewModel: ChantViewModel
 ) {
-                    Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(AppConstants.Dimensions.SPACING_MEDIUM),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (chantLogs.isNotEmpty()) {
-                        val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
-                        Text(
-                            text = sampurnamalaFormat.format(
-                                chantLogs.last().malaNumber,
-                                totalTime
-                            ),
-                            Modifier.padding(AppConstants.Dimensions.SPACING_SMALL),
-                            fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
-                            color = textColorSuggestion,
-                            fontWeight = FontWeight.Bold
-                        )
-                    } else {
-                        Text(
-                            text = " ",
-                            Modifier.padding(AppConstants.Dimensions.SPACING_SMALL),
-                            fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
-                            color = textColorSuggestion,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(AppConstants.Dimensions.SPACING_MEDIUM),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (chantLogs.isNotEmpty()) {
+            val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
+            Text(
+                text = sampurnamalaFormat.format(
+                    chantLogs.last().malaNumber,
+                    totalTime
+                ),
+                Modifier.padding(AppConstants.Dimensions.SPACING_SMALL),
+                fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
+                color = textColorSuggestion,
+                fontWeight = FontWeight.Bold
+            )
+        } else {
+            Text(
+                text = " ",
+                Modifier.padding(AppConstants.Dimensions.SPACING_SMALL),
+                fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
+                color = textColorSuggestion,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
-                    Text(
-                        text = suggestion,
-                        fontSize = AppConstants.Typography.FONT_SIZE_MEDIUM,
-                        modifier = Modifier.padding(AppConstants.Dimensions.SPACING_XXLARGE),
-                        color = textColorSuggestion,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+        Text(
+            text = suggestion,
+            fontSize = AppConstants.Typography.FONT_SIZE_MEDIUM,
+            modifier = Modifier.padding(AppConstants.Dimensions.SPACING_XXLARGE),
+            color = textColorSuggestion,
+            fontWeight = FontWeight.Bold
+        )
+    }
 }
 
 /**
  * Displays the control buttons for mantra chanting
- * 
+ *
  * @param viewModel ChantViewModel for state management
  * @param onIncrement Callback for increment button press
  * @param onDecrement Callback for decrement button press
- * 
+ *
  * Shows three buttons: decrement (-1), auto-chant toggle, and increment (+1).
  * Button colors change based on auto-chant state to provide visual feedback.
  */
@@ -249,10 +411,10 @@ private fun MantraButtonsSection(
 
 /**
  * Converts chant feedback state to localized string
- * 
+ *
  * @param chantFeedback The current chant speed feedback state
  * @return Localized string message for the feedback state
- * 
+ *
  * Maps the ChantFeedback enum to appropriate localized string resources
  * for displaying user feedback about chanting speed.
  */
