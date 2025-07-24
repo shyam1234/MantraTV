@@ -41,7 +41,7 @@ fun MantraRender(name: String) {
     Text(
         text = name,
         style = MaterialTheme.typography.titleLarge.copy(
-            fontSize = AppConstants.Typography.FONT_SIZE_XXXLARGE, 
+            fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
             lineHeight = AppConstants.Typography.LINE_HEIGHT_MANTRA
         ),
         textAlign = TextAlign.Center,
@@ -109,7 +109,7 @@ fun GrayCircleWithNumber2(count: Int, color: Color) {
         circleColors[count - 1] = color
     }
 
-    Box(contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         // Main circle with the count in center
         Canvas(modifier = Modifier.size(AppConstants.Dimensions.CIRCLE_MAIN_SIZE)) {
             drawCircle(
@@ -159,17 +159,9 @@ fun GrayCircleWithNumber2(count: Int, color: Color) {
  * Uses infinite scrolling animation with configurable speed and styling.
  */
 @Composable
-fun FlashMessage(message: String) {
+fun FlashMessage(message: String, modifier: Modifier) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .basicMarquee(
-                iterations = AppConstants.MARQUEE_ITERATIONS, 
-                animationMode = MarqueeAnimationMode.Immediately, 
-                velocity = AppConstants.MARQUEE_VELOCITY.dp
-            )
-            .padding(AppConstants.Dimensions.SPACING_MEDIUM),
-        contentAlignment = Alignment.TopCenter
+        modifier = modifier
     ){
         Text(
             message,

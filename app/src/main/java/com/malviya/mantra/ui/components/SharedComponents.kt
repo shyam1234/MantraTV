@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.malviya.mantra.R
 import com.malviya.mantra.ui.constants.AppConstants
 import com.malviya.mantra.ui.screen.ChantLog
@@ -63,223 +64,85 @@ fun MantraScreenLayout(
     onDecrement: () -> Unit
 ) {
     val chantLogs by viewModel.chantLogs.collectAsState()
+    val chantFeedback by viewModel.chantFeedback.collectAsState()
     val context = LocalContext.current
     val poweredBy = stringResource(id = R.string.powered_by)
     val buildNumber = context.packageManager.getPackageInfo(context.packageName, 0).versionName
     val sampurnamalaFormat = context.getString(R.string.sampurnamala)
-    val chantFeedback by viewModel.chantFeedback.collectAsState()
     val suggestion = getChantFeedback(chantFeedback)
 
-    /*DynamicBackground {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(AppConstants.Dimensions.SPACING_LARGE)
-        ) {
-
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-
-                // Constraint references
-                val (topRef, mid1Ref, mid2Ref, mid3Ref,mid4Ref, bottomRef) = createRefs()
-                //-TOP-----------------------
-                Box(
-                    modifier = Modifier
-                        .constrainAs(topRef) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                        .fillMaxSize()
-                ) {
-                    FlashMessage(flashMessage)
-                }
-                //--MIDDLE 1---------------------
-                Box(
-                    modifier = Modifier
-                        .constrainAs(mid1Ref) {
-                            top.linkTo(topRef.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }) {
-                    MantraRender(name)
-                }
-                //-MIDDLE 2---------------------
-                Box(
-                    modifier = Modifier
-                        .constrainAs(mid2Ref) {
-                            top.linkTo(mid1Ref.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }) {
-                    // Mantra logs
-                    MantraLogsSection(chantLogs, sampurnamalaFormat, suggestion, viewModel)
-                }
-                //-MIDDLE 3---------------------
-                // Center content (counter circle or mala visualization)
-                Box(
-                    modifier = Modifier
-                        .constrainAs(mid3Ref) {
-                            top.linkTo(mid2Ref.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                        .padding(bottom = AppConstants.Dimensions.SPACING_XLARGE)
-                ) {
-                    centerContent()
-                }
-                //-MIDDLE 4---------------------
-                Box(
-                    modifier = Modifier
-                        .constrainAs(mid4Ref) {
-                            top.linkTo(mid3Ref.bottom)
-                            bottom.linkTo(bottomRef.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                        .padding(bottom = AppConstants.Dimensions.SPACING_XLARGE)
-                ) {
-                    // Mantra buttons
-                    MantraButtonsSection(
-                        viewModel = viewModel,
-                        onIncrement = onIncrement,
-                        onDecrement = onDecrement
-                    )
-                }
-                //-BOTTOM ---------------------
-                Box(
-                    modifier = Modifier
-                        .constrainAs(mid4Ref) {
-                            top.linkTo(parent.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                        .padding(bottom = AppConstants.Dimensions.SPACING_TINY)
-                ) {
-                    // Watermark text at the bottom center
-                    Text(
-                        text = "$poweredBy ${AppConstants.UI.WATERMARK_SEPARATOR} ${AppConstants.UI.WATERMARK_PREFIX}$buildNumber",
-                        color = textColorPowerBy,
-                        fontSize = AppConstants.Typography.FONT_SIZE_TINY,
-                        fontWeight = FontWeight.Light
-                    )
-                }
-            }
-        }
-    }*/
     DynamicBackground {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
+        ConstraintLayout(
+            modifier = Modifier.fillMaxSize()
         ) {
+            val (flashRef, contentRef, watermarkRef) = createRefs()
 
-            Box(
+            // Top Flash Message
+            FlashMessage(
+                flashMessage,
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(bottom = AppConstants.Dimensions.SPACING_TINY)
-            ) {
-                FlashMessage(flashMessage)
-            }
-
-            Box(modifier = Modifier
-                .align(Alignment.Center)){
-                // Scrollable content
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(
-                            start = AppConstants.Dimensions.SPACING_LARGE,
-                            end = AppConstants.Dimensions.SPACING_LARGE,
-                            top = AppConstants.Dimensions.SPACING_XXLARGE,
-                            bottom = AppConstants.Dimensions.SPACING_XXLARGE // 👈 leave space for bottom text
-                        )
-                ) {
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                    ) {
-                        val (mid1Ref, mid2Ref, mid3Ref, mid4Ref) = createRefs()
-
-
-                        // Middle 1
-                        Box(
-                            modifier = Modifier
-                                .constrainAs(mid1Ref) {
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(parent.end)
-                                }
-                        ) {
-                            MantraRender(name)
-                        }
-
-                        // Middle 2
-                        Box(
-                            modifier = Modifier
-                                .constrainAs(mid2Ref) {
-                                    top.linkTo(mid1Ref.bottom)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(parent.end)
-                                }
-                        ) {
-                            MantraLogsSection(chantLogs, sampurnamalaFormat, suggestion, viewModel)
-                        }
-
-                        // Middle 3
-                        Box(
-                            modifier = Modifier
-                                .constrainAs(mid3Ref) {
-                                    top.linkTo(mid2Ref.bottom)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(parent.end)
-                                }
-                                .padding(bottom = AppConstants.Dimensions.SPACING_XLARGE)
-                        ) {
-                            centerContent()
-                        }
-
-                        // Middle 4 (Mantra Buttons)
-                        Box(
-                            modifier = Modifier
-                                .constrainAs(mid4Ref) {
-                                    top.linkTo(mid3Ref.bottom)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(parent.end)
-                                }
-                                .padding(bottom = AppConstants.Dimensions.SPACING_XLARGE)
-                        ) {
-                            MantraButtonsSection(
-                                viewModel = viewModel,
-                                onIncrement = onIncrement,
-                                onDecrement = onDecrement
-                            )
-                        }
+                    .constrainAs(flashRef) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
                     }
-                }
-            }
-
-            // Fixed bottom watermark (pinned to screen bottom)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
                     .padding(bottom = AppConstants.Dimensions.SPACING_TINY)
+            )
+
+            // Scrollable Center Content
+            Column(
+                modifier = Modifier
+                    .constrainAs(contentRef) {
+                        top.linkTo(flashRef.bottom)
+                        bottom.linkTo(watermarkRef.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.fillToConstraints
+                    }
+                    .verticalScroll(rememberScrollState())
+                    .padding(
+                        start = AppConstants.Dimensions.SPACING_TINY,
+                        end = AppConstants.Dimensions.SPACING_TINY,
+                        top = AppConstants.Dimensions.SPACING_TINY,
+                        bottom = AppConstants.Dimensions.SPACING_TINY
+                    )
             ) {
-                Text(
-                    text = "$poweredBy ${AppConstants.UI.WATERMARK_SEPARATOR} ${AppConstants.UI.WATERMARK_PREFIX}$buildNumber",
-                    color = textColorPowerBy,
-                    fontSize = AppConstants.Typography.FONT_SIZE_TINY,
-                    fontWeight = FontWeight.Light
+                MantraRender(name)
+
+                MantraLogsSection(
+                    chantLogs = chantLogs,
+                    sampurnamalaFormat = sampurnamalaFormat,
+                    suggestion = suggestion,
+                    viewModel = viewModel
+                )
+
+                centerContent()
+
+                MantraButtonsSection(
+                    viewModel = viewModel,
+                    onIncrement = onIncrement,
+                    onDecrement = onDecrement
                 )
             }
+
+            // Bottom Watermark
+            Text(
+                text = "$poweredBy ${AppConstants.UI.WATERMARK_SEPARATOR} ${AppConstants.UI.WATERMARK_PREFIX}$buildNumber",
+                color = textColorPowerBy,
+                fontSize = AppConstants.Typography.FONT_SIZE_TINY,
+                fontWeight = FontWeight.Light,
+                modifier = Modifier
+                    .constrainAs(watermarkRef) {
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .padding(bottom = AppConstants.Dimensions.SPACING_TINY)
+            )
         }
     }
-
-
 }
+
 
 /**
  * Displays mantra logs and feedback section

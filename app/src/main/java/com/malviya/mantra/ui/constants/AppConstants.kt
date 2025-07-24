@@ -87,7 +87,7 @@ object AppConstants {
         val FONT_SIZE_COUNTER = 44.sp
         
         // Line heights
-        val LINE_HEIGHT_MANTRA = 80.sp
+        val LINE_HEIGHT_MANTRA = 60.sp
         val LINE_HEIGHT_DEFAULT = 24.sp
         val LINE_HEIGHT_TITLE = 28.sp
         val LINE_HEIGHT_CAPTION = 16.sp
