@@ -75,7 +75,7 @@ fun MantraScreenLayout(
         ConstraintLayout(
             modifier = Modifier.fillMaxSize()
         ) {
-            val (flashRef, contentRef, watermarkRef) = createRefs()
+           val (flashRef, contentRef, watermarkRef) = createRefs()
 
             // Top Flash Message
             FlashMessage(
@@ -107,7 +107,20 @@ fun MantraScreenLayout(
                         bottom = AppConstants.Dimensions.SPACING_TINY
                     )
             ) {
-                MantraRender(name)
+                // Use highlighted text when auto-chant is active, otherwise use regular mantra render
+                val isAutoChanting by viewModel.isAutoChanting.collectAsState()
+                val isAudioPlaying by viewModel.isAudioPlaying.collectAsState()
+                val currentWordIndex by viewModel.currentWordIndex.collectAsState()
+                
+                if (isAutoChanting && isAudioPlaying) {
+                    MantraHighlightedText(
+                        mantraText = viewModel.getMantraText(),
+                        highlightedWordIndex = currentWordIndex,
+                        isAudioPlaying = isAudioPlaying
+                    )
+                } else {
+                    MantraRender(name)
+                }
 
                 MantraLogsSection(
                     chantLogs = chantLogs,

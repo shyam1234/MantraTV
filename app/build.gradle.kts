@@ -39,6 +39,10 @@ android {
     buildFeatures {
         compose = true
     }
+    
+    lint {
+        disable += "NullSafeMutableLiveData"
+    }
 }
 
 dependencies {
@@ -52,6 +56,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.timber)
+    
+    // Text-to-Speech
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
 
     // Google Play Services
     //implementation(libs.play.services.base)

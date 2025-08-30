@@ -1,5 +1,6 @@
 package com.malviya.mantra.ui.viewmodel
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import com.malviya.mantra.firebase.RemoteConfigService
 import com.malviya.mantra.firebase.logAutoChant
 import com.malviya.mantra.firebase.logManualChant
 import com.malviya.mantra.firebase.logSampurnaMala
+import com.malviya.mantra.speech.AudioManager
 import com.malviya.mantra.ui.screen.ChantLog
 import com.malviya.mantra.ui.theme.colorButtonGray
 import com.malviya.mantra.ui.theme.colorGreen
@@ -94,6 +96,23 @@ class ChantViewModel : ViewModel() {
     private val _count = MutableStateFlow<Int>(0)
     val count : StateFlow<Int> = _count
 
+    // ==================== AUDIO STATE FLOWS ====================
+    
+    /** Audio manager for TTS functionality */
+    private var audioManager: AudioManager? = null
+    
+    /** Whether audio is currently playing */
+    private val _isAudioPlaying = MutableStateFlow(false)
+    val isAudioPlaying: StateFlow<Boolean> = _isAudioPlaying.asStateFlow()
+    
+    /** Current highlighted word index in the mantra */
+    private val _currentWordIndex = MutableStateFlow(-1)
+    val currentWordIndex: StateFlow<Int> = _currentWordIndex.asStateFlow()
+    
+    /** Whether TTS is ready */
+    private val _isTtsReady = MutableStateFlow(false)
+    val isTtsReady: StateFlow<Boolean> = _isTtsReady.asStateFlow()
+
     // ==================== PRIVATE VARIABLES ====================
     
     /** Start time of the current mala round */
@@ -109,15 +128,50 @@ class ChantViewModel : ViewModel() {
     private var chantJob: Job? = null
 
     /**
+     * Initializes the audio manager with context
+     * 
+     * @param context Application context for TTS initialization
+     */
+    fun initializeAudioManager(context: Context) {
+        if (audioManager == null) {
+            audioManager = AudioManager(context)
+            // Observe audio manager state flows
+            viewModelScope.launch {
+                audioManager?.isAudioPlaying?.collect { isPlaying ->
+                    _isAudioPlaying.value = isPlaying
+                }
+            }
+            viewModelScope.launch {
+                audioManager?.currentWordIndex?.collect { wordIndex ->
+                    _currentWordIndex.value = wordIndex
+                }
+            }
+            viewModelScope.launch {
+                audioManager?.isTtsReady?.collect { isReady ->
+                    _isTtsReady.value = isReady
+                    // Test TTS when it becomes ready
+                    if (isReady) {
+                        audioManager?.testTts()
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Toggles auto-chant functionality on/off
      * 
-     * When enabled, automatically increments the bead count at regular intervals.
+     * When enabled, automatically increments the bead count at regular intervals
+     * and starts audio playback with word highlighting.
      * Logs the auto-chant state change to Firebase Analytics.
      */
     fun toggleAutoChant() {
         _isAutoChanting.value = !_isAutoChanting.value
         if (_isAutoChanting.value) {
             startAutoChant()
+            audioManager?.startAudio()
+        } else {
+            audioManager?.stopAudio()
         }
         logAutoChant(_isAutoChanting.value)
     }
@@ -278,12 +332,23 @@ class ChantViewModel : ViewModel() {
     }
 
     /**
+     * Gets the mantra text for display
+     * 
+     * @return The complete mantra text string
+     */
+    fun getMantraText(): String {
+        return audioManager?.getMantraText() ?: "हरे कृष्ण, हरे कृष्ण, कृष्ण कृष्ण, हरे हरे|\nहरे राम, हरे राम, राम राम, हरे हरे||"
+    }
+
+    /**
      * Called when the ViewModel is being cleared
-     * Ensures auto-chant is stopped to prevent memory leaks
+     * Ensures auto-chant is stopped and audio resources are released
      */
     override fun onCleared() {
         super.onCleared()
         stopAutoChant()
+        audioManager?.release()
+        audioManager = null
     }
 
     /**
