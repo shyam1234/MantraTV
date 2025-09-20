@@ -1,5 +1,6 @@
 package com.malviya.mantra.ui.viewmodel
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import com.malviya.mantra.firebase.RemoteConfigService
 import com.malviya.mantra.firebase.logAutoChant
 import com.malviya.mantra.firebase.logManualChant
 import com.malviya.mantra.firebase.logSampurnaMala
+import com.malviya.mantra.speech.AudioManager
 import com.malviya.mantra.ui.screen.ChantLog
 import com.malviya.mantra.ui.theme.colorButtonGray
 import com.malviya.mantra.ui.theme.colorGreen
@@ -94,6 +96,23 @@ class ChantViewModel : ViewModel() {
     private val _count = MutableStateFlow<Int>(0)
     val count : StateFlow<Int> = _count
 
+    // ==================== AUDIO STATE FLOWS ====================
+    
+    /** Audio manager for MP3 playback functionality */
+    private var audioManager: AudioManager? = null
+    
+    /** Whether audio is currently playing */
+    private val _isAudioPlaying = MutableStateFlow(false)
+    val isAudioPlaying: StateFlow<Boolean> = _isAudioPlaying.asStateFlow()
+    
+    /** Current highlighted word index in the mantra */
+    private val _currentWordIndex = MutableStateFlow(-1)
+    val currentWordIndex: StateFlow<Int> = _currentWordIndex.asStateFlow()
+    
+    /** Whether audio is ready */
+    private val _isAudioReady = MutableStateFlow(false)
+    val isAudioReady: StateFlow<Boolean> = _isAudioReady.asStateFlow()
+
     // ==================== PRIVATE VARIABLES ====================
     
     /** Start time of the current mala round */
@@ -109,15 +128,57 @@ class ChantViewModel : ViewModel() {
     private var chantJob: Job? = null
 
     /**
+     * Initializes the audio manager with context
+     * 
+     * @param context Application context for audio initialization
+     */
+    fun initializeAudioManager(context: Context) {
+        if (audioManager == null) {
+            audioManager = AudioManager(context)
+            
+            // Set callback for audio completion to increment counter
+            audioManager?.setOnAudioCompleteCallback {
+                viewModelScope.launch {
+                    Timber.d("Audio completion callback triggered, incrementing counter")
+                    incrementCount()
+                }
+            }
+            
+            // Observe audio manager state flows
+            viewModelScope.launch {
+                audioManager?.isAudioPlaying?.collect { isPlaying ->
+                    _isAudioPlaying.value = isPlaying
+                }
+            }
+            viewModelScope.launch {
+                audioManager?.currentWordIndex?.collect { wordIndex ->
+                    _currentWordIndex.value = wordIndex
+                }
+            }
+            viewModelScope.launch {
+                audioManager?.isAudioReady?.collect { isReady ->
+                    _isAudioReady.value = isReady
+                }
+            }
+        }
+    }
+
+    /**
      * Toggles auto-chant functionality on/off
      * 
-     * When enabled, automatically increments the bead count at regular intervals.
+     * When enabled, starts audio playback with word highlighting and looping.
+     * Counter increments each time audio completes one cycle.
      * Logs the auto-chant state change to Firebase Analytics.
      */
     fun toggleAutoChant() {
+        Timber.d("toggleAutoChant")
         _isAutoChanting.value = !_isAutoChanting.value
         if (_isAutoChanting.value) {
-            startAutoChant()
+            // Start audio playback with looping
+            audioManager?.startAudio()
+        } else {
+            // Stop audio playback
+            audioManager?.stopAudio()
         }
         logAutoChant(_isAutoChanting.value)
     }
@@ -278,12 +339,23 @@ class ChantViewModel : ViewModel() {
     }
 
     /**
+     * Gets the mantra text for display
+     * 
+     * @return The complete mantra text string
+     */
+    fun getMantraText(): String {
+        return audioManager?.getMantraText() ?: "हरे कृष्ण, हरे कृष्ण, कृष्ण कृष्ण, हरे हरे|\nहरे राम, हरे राम, राम राम, हरे हरे||"
+    }
+
+    /**
      * Called when the ViewModel is being cleared
-     * Ensures auto-chant is stopped to prevent memory leaks
+     * Ensures auto-chant is stopped and audio resources are released
      */
     override fun onCleared() {
         super.onCleared()
         stopAutoChant()
+        audioManager?.release()
+        audioManager = null
     }
 
     /**

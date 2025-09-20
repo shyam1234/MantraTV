@@ -19,6 +19,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Timber.plant(Timber.DebugTree())
 
+        // Initialize audio manager
+        chantViewModel.initializeAudioManager(this)
+
         //enableEdgeToEdge()
         setContent {
             MantraTheme {
