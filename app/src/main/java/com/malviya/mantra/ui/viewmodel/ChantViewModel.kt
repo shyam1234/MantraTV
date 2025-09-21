@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Locale
+import kotlin.properties.Delegates
 
 /**
  * ViewModel for managing chant-related state and business logic
@@ -64,9 +65,11 @@ class ChantViewModel : ViewModel() {
     }
 
     // ==================== STATE FLOWS ====================
-    
+
+    private var malaCompletedTime by Delegates.notNull<Long>()
+
     /** Remote configuration service for dynamic app configuration */
-    val remoteConfigService: StateFlow<RemoteConfigService> = MutableStateFlow(RemoteConfigService())
+    val remoteConfigService: StateFlow<RemoteConfigService?> = MutableStateFlow(null)
 
     /** Auto-chanting state - true when auto-chant is active */
     private val _isAutoChanting = MutableStateFlow(false)
@@ -126,6 +129,16 @@ class ChantViewModel : ViewModel() {
 
     /** Coroutine job for auto-chanting functionality */
     private var chantJob: Job? = null
+
+    /**
+     * Initializes the remote config service
+     * This should be called from the main application, not during unit tests
+     */
+    fun initializeRemoteConfig() {
+        if (remoteConfigService.value == null) {
+            (remoteConfigService as MutableStateFlow).value = RemoteConfigService()
+        }
+    }
 
     /**
      * Initializes the audio manager with context
@@ -224,11 +237,11 @@ class ChantViewModel : ViewModel() {
         }
         viewModelScope.launch {
             if (_count.value == AppConstants.ONE_MALA_ROUND_COUNT) {
-                // Mala round is completed, reset count and log time
-                _count.value = 0
-                _color.value = Color.Gray
-                _chantFeedback.value = ChantFeedback.Begin
-                
+                    // Mala round is completed, reset count and log time
+                    _count.value = 0
+                    _color.value = Color.Gray
+                    _chantFeedback.value = ChantFeedback.Begin
+
                 // Calculate time taken for the current mala and log it
                 _malaNumber.value += 1
                 val malaCompletedTime = System.currentTimeMillis() - startTime
@@ -236,10 +249,10 @@ class ChantViewModel : ViewModel() {
                 _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime, totalTime)
                 logSampurnaMala(_malaNumber.value, (malaCompletedTime/AppConstants.TimeFormat.MILLISECONDS_IN_MINUTE))
             } else {
-                _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
-                // Increment the bead count
-                oneBidTAT = System.currentTimeMillis()
-                _count.value += 1
+                    _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
+                    // Increment the bead count
+                    oneBidTAT = System.currentTimeMillis()
+                    _count.value += 1
             }
 
             // Start time when count is 1 (first bead in mala)

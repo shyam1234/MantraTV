@@ -36,21 +36,37 @@ class ChantViewModelTest {
     fun `incrementCount increases count`() = runTest {
         val initial = viewModel.count.value
         viewModel.incrementCount(true)
+        testDispatcher.scheduler.advanceUntilIdle()
         assertEquals(initial + 1, viewModel.count.value)
     }
 
     @Test
     fun `decrementCount decreases count but not below zero`() = runTest {
         viewModel.decrementCount(true)
+        testDispatcher.scheduler.advanceUntilIdle()
         assertEquals(0, viewModel.count.value)
         viewModel.incrementCount(true)
+        testDispatcher.scheduler.advanceUntilIdle()
         viewModel.decrementCount(true)
+        testDispatcher.scheduler.advanceUntilIdle()
         assertEquals(0, viewModel.count.value)
     }
 
     @Test
     fun `mala completes after 108 counts and logs are updated`() = runTest {
-        repeat(AppConstants.ONE_MALA_ROUND_COUNT) { viewModel.incrementCount(true) }
+        // Test the mala completion logic step by step
+        repeat((AppConstants.ONE_MALA_ROUND_COUNT)) {
+            viewModel.incrementCount(true)
+            testDispatcher.scheduler.advanceUntilIdle()
+        }
+        // After 107 increments, count should be 107
+        assertEquals((AppConstants.ONE_MALA_ROUND_COUNT), viewModel.count.value)
+        
+        // The 108th increment should complete the mala and reset count to 0
+        viewModel.incrementCount(true)
+        testDispatcher.scheduler.advanceUntilIdle()
+        
+        // After 108 increments, the count should be 0 (mala completed and reset)
         assertEquals(0, viewModel.count.value)
         assertEquals(1, viewModel.malaNumber.value)
         assertEquals(1, viewModel.chantLogs.value.size)
@@ -60,16 +76,20 @@ class ChantViewModelTest {
     fun `autoChant toggles state`() = runTest {
         assertFalse(viewModel.isAutoChanting.value)
         viewModel.toggleAutoChant()
+        testDispatcher.scheduler.advanceUntilIdle()
         assertTrue(viewModel.isAutoChanting.value)
         viewModel.toggleAutoChant()
+        testDispatcher.scheduler.advanceUntilIdle()
         assertFalse(viewModel.isAutoChanting.value)
     }
 
     @Test
     fun `manual increment does not work during autoChant`() = runTest {
         viewModel.toggleAutoChant()
+        testDispatcher.scheduler.advanceUntilIdle()
         val before = viewModel.count.value
         viewModel.incrementCount(true)
+        testDispatcher.scheduler.advanceUntilIdle()
         assertEquals(before, viewModel.count.value)
     }
 

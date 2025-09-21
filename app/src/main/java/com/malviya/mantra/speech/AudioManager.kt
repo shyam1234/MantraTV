@@ -2,6 +2,7 @@ package com.malviya.mantra.speech
 
 import android.content.Context
 import android.media.MediaPlayer
+import com.malviya.mantra.ui.constants.AppConstants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -195,7 +196,7 @@ class AudioManager(private val context: Context) {
      */
     private fun createDefaultTimingData() {
         val defaultTiming = mutableListOf<TimingEntry>()
-        val wordDuration = 2000L // 2 seconds per word
+        val wordDuration = 450L //  ms per word
         
         for (i in mantraWords.indices) {
             defaultTiming.add(TimingEntry(i * wordDuration, i))
@@ -254,7 +255,7 @@ class AudioManager(private val context: Context) {
         // Simulate word progression
         Thread {
             var currentTime = 0L
-            val totalDuration = 30000L // 30 seconds for complete mantra
+            val totalDuration = AppConstants.IDLE_TIME_FOR_ONE_BEAD // ms for complete mantra
             
             while (_isAudioPlaying.value && isLoopingAudio) {
                 try {

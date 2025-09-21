@@ -21,6 +21,9 @@ class MainActivity : ComponentActivity() {
 
         // Initialize audio manager
         chantViewModel.initializeAudioManager(this)
+        
+        // Initialize remote config service
+        chantViewModel.initializeRemoteConfig()
 
         //enableEdgeToEdge()
         setContent {

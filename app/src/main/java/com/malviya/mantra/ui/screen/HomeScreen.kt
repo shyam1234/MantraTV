@@ -42,7 +42,7 @@ fun GreetingScreen(name: String, viewModel: ChantViewModel) {
     MantraScreenLayout(
         name = name,
         viewModel = viewModel,
-        flashMessage = remoteConfigService.getFlashMessage(),
+        flashMessage = remoteConfigService?.getFlashMessage() ?: "",
         centerContent = {
             GrayCircleWithNumber2(count, color)
         },
