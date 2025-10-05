@@ -2,9 +2,11 @@ package com.malviya.mantra.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.ui.res.stringResource
+import androidx.core.app.ActivityCompat.finishAffinity
 
 import com.malviya.mantra.R
 import com.malviya.mantra.ui.screen.GreetingScreen
@@ -31,6 +33,14 @@ class MainActivity : ComponentActivity() {
                 GreetingScreen( name = stringResource(R.string.greeting),chantViewModel)
             }
         }
+
+        // Register callback for back press
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishAffinity()  // ✅ closes all activities and exits app
+            }
+        })
     }
+
 }
 
