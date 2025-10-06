@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
         // Register callback for back press
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                finishAffinity()  // ✅ closes all activities and exits app
+                finishAffinity()  //closes all activities and exits app
             }
         })
     }

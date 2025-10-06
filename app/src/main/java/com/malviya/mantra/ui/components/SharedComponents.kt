@@ -1,6 +1,12 @@
 package com.malviya.mantra.ui.components
 
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +22,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,6 +48,8 @@ import com.malviya.mantra.ui.constants.AppConstants
 import com.malviya.mantra.ui.screen.ChantLog
 import com.malviya.mantra.ui.theme.colorButtonGray
 import com.malviya.mantra.ui.theme.colorButtonGreen
+import com.malviya.mantra.ui.theme.colorFocusBorder
+import com.malviya.mantra.ui.theme.colorFocusHighlight
 import com.malviya.mantra.ui.theme.textColorButton
 import com.malviya.mantra.ui.theme.textColorPowerBy
 import com.malviya.mantra.ui.theme.textColorSuggestion
@@ -80,11 +95,12 @@ fun MantraScreenLayout(
             // Top Flash Message
             FlashMessage(
                 flashMessage,
-                modifier = Modifier
+                modifier = Modifier.basicMarquee(iterations = AppConstants.MARQUEE_ITERATIONS, velocity = AppConstants.MARQUEE_VELOCITY.dp)
                     .constrainAs(flashRef) {
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
+
                     }
                     .padding(bottom = AppConstants.Dimensions.SPACING_TINY)
             )
@@ -214,6 +230,57 @@ private fun MantraLogsSection(
 }
 
 /**
+ * Custom focusable button with highlighting
+ *
+ * @param onClick Callback for button press
+ * @param modifier Modifier for the button
+ * @param enabled Whether the button is enabled
+ * @param containerColor Background color of the button
+ * @param contentColor Text color of the button
+ * @param content Button content (usually Text)
+ *
+ * A focusable button that shows a golden highlight and border when focused.
+ */
+@Composable
+private fun FocusableButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    containerColor: Color,
+    contentColor: Color,
+    content: @Composable () -> Unit
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .focusRequester(focusRequester)
+            .focusable()
+            .onFocusChanged { isFocused = it.isFocused }
+            .then(
+                if (isFocused) {
+                    Modifier.border(
+                        width = 3.dp,
+                        color = colorFocusBorder,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                } else {
+                    Modifier
+                }
+            ),
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isFocused) colorFocusHighlight.copy(alpha = 0.3f) else containerColor,
+            contentColor = contentColor
+        )
+    ) {
+        content()
+    }
+}
+
+/**
  * Displays the control buttons for mantra chanting
  *
  * @param viewModel ChantViewModel for state management
@@ -222,6 +289,7 @@ private fun MantraLogsSection(
  *
  * Shows three buttons: decrement (-1), auto-chant toggle, and increment (+1).
  * Button colors change based on auto-chant state to provide visual feedback.
+ * All buttons now support focus highlighting for better accessibility.
  */
 @Composable
 private fun MantraButtonsSection(
@@ -241,40 +309,35 @@ private fun MantraButtonsSection(
             .padding(AppConstants.Dimensions.SPACING_XLARGE),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Button(
+        FocusableButton(
             onClick = onDecrement,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray
-            ),
+            containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray,
+            contentColor = if (!isAutoChanting) textWhiteColorButton else textColorButton,
         ) {
             Text(
                 text = decrementText,
                 fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
                 fontWeight = FontWeight.Bold,
-                color = if (!isAutoChanting) textWhiteColorButton else textColorButton,
             )
         }
 
         // Auto Chant Toggle Button
-        Button(
+        FocusableButton(
             onClick = { viewModel.toggleAutoChant() },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (isAutoChanting) colorButtonGreen else colorButtonGray
-            )
+            containerColor = if (isAutoChanting) colorButtonGreen else colorButtonGray,
+            contentColor = if (isAutoChanting) textWhiteColorButton else textColorButton,
         ) {
             Text(
                 text = if (isAutoChanting) autoChantOnText else autoChantOffText,
                 fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
-                color = if (isAutoChanting) textWhiteColorButton else textColorButton,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        Button(
+        FocusableButton(
             onClick = onIncrement,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray
-            ),
+            containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray,
+            contentColor = if (!isAutoChanting) textWhiteColorButton else textColorButton,
         ) {
             Text(
                 text = incrementText,
