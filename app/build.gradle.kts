@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "com.malviya.mantra"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.malviya.mantra"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 24
-        versionName = "1.0.24"
+        targetSdk = 36
+        versionCode = 25
+        versionName = "1.0.25"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
