@@ -237,7 +237,7 @@ fun MantraHighlightedText(
                                 color = backgroundColor,
                                 shape = RoundedCornerShape(8.dp)
                             )
-                            .padding(horizontal = 4.dp, vertical = 0.dp)
+                            .padding(horizontal = 5.dp, vertical = 0.dp)
                     )
 
                     if (i < 7) {
@@ -274,7 +274,7 @@ fun MantraHighlightedText(
                                 color = backgroundColor,
                                 shape = RoundedCornerShape(8.dp)
                             )
-                            .padding(horizontal = 4.dp, vertical = 0.dp)
+                            .padding(horizontal = 5.dp, vertical = 0.dp)
                     )
 
                     if (i < 15) {
