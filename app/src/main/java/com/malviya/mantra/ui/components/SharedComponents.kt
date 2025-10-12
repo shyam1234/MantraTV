@@ -280,6 +280,81 @@ private fun FocusableButton(
     }
 }
 
+
+
+
+/**
+ * Displays the control buttons for mantra chanting
+ *
+ * @param viewModel ChantViewModel for state management
+ * @param onIncrement Callback for increment button press
+ * @param onDecrement Callback for decrement button press
+ *
+ * Shows three buttons: decrement (-1), auto-chant toggle, and increment (+1).
+ * Button colors change based on auto-chant state to provide visual feedback.
+ */
+@Composable
+private fun MantraButtonsSection(
+    viewModel: ChantViewModel,
+    onIncrement: () -> Unit,
+    onDecrement: () -> Unit
+) {
+    val decrementText = stringResource(id = R.string.decrement_button)
+    val incrementText = stringResource(id = R.string.increment_button)
+    val autoChantOnText = stringResource(id = R.string.auto_chant_on)
+    val autoChantOffText = stringResource(id = R.string.auto_chant_off)
+    val isAutoChanting by viewModel.isAutoChanting.collectAsState()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(AppConstants.Dimensions.SPACING_XLARGE),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Button(
+            onClick = onDecrement,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray
+            ),
+        ) {
+            Text(
+                text = decrementText,
+                fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
+                fontWeight = FontWeight.Bold,
+                color = if (!isAutoChanting) textWhiteColorButton else textColorButton,
+            )
+        }
+
+        // Auto Chant Toggle Button
+        Button(
+            onClick = { viewModel.toggleAutoChant() },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isAutoChanting) colorButtonGreen else colorButtonGray
+            )
+        ) {
+            Text(
+                text = if (isAutoChanting) autoChantOnText else autoChantOffText,
+                fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
+                color = if (isAutoChanting) textWhiteColorButton else textColorButton,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Button(
+            onClick = onIncrement,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray
+            ),
+        ) {
+            Text(
+                text = incrementText,
+                fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+}
+
 /**
  * Displays the control buttons for mantra chanting
  *
@@ -290,7 +365,6 @@ private fun FocusableButton(
  * Shows three buttons: decrement (-1), auto-chant toggle, and increment (+1).
  * Button colors change based on auto-chant state to provide visual feedback.
  * All buttons now support focus highlighting for better accessibility.
- */
 @Composable
 private fun MantraButtonsSection(
     viewModel: ChantViewModel,
@@ -346,7 +420,7 @@ private fun MantraButtonsSection(
             )
         }
     }
-}
+}*/
 
 /**
  * Converts chant feedback state to localized string
