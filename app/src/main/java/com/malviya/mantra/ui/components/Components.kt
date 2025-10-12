@@ -1,19 +1,27 @@
 package com.malviya.mantra.ui.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -21,37 +29,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.malviya.mantra.ui.constants.AppConstants
+import com.malviya.mantra.ui.theme.highlightedTextBGColorMantra
+import com.malviya.mantra.ui.theme.highlightedTextColorMantra
 import com.malviya.mantra.ui.theme.textColorMantra
 import kotlin.math.cos
 import kotlin.math.sin
 
 
-/**
- * Renders the main mantra text with proper styling
- * 
- * @param name The mantra text to display
- * 
- * Displays the mantra in large, bold text with proper spacing and alignment.
- * Uses the theme's mantra color for consistent branding.
- */
-@Composable
-fun MantraRender(name: String) {
-    Text(
-        text = name,
-        style = MaterialTheme.typography.titleLarge.copy(
-            fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
-            lineHeight = AppConstants.Typography.LINE_HEIGHT_MANTRA
-        ),
-        textAlign = TextAlign.Center,
-        color = textColorMantra,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier
-            .padding(AppConstants.Dimensions.SPACING_MEDIUM)
-            .fillMaxWidth(AppConstants.Layout.FILL_MAX_WIDTH)
-    )
-}
+
 
 /**
  * Simple circular counter display
@@ -170,6 +156,133 @@ fun FlashMessage(message: String, modifier: Modifier) {
             fontSize = AppConstants.Typography.FONT_SIZE_SMALL,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+
+/**
+ * Renders the main mantra text with proper styling
+ *
+ * @param name The mantra text to display
+ *
+ * Displays the mantra in large, bold text with proper spacing and alignment.
+ * Uses the theme's mantra color for consistent branding.
+ */
+@Composable
+fun MantraRender(name: String) {
+    Text(
+        text = name,
+        style = MaterialTheme.typography.titleLarge.copy(
+            fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
+            lineHeight = AppConstants.Typography.LINE_HEIGHT_MANTRA
+        ),
+        textAlign = TextAlign.Center,
+        color = textColorMantra,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier
+            .padding(AppConstants.Dimensions.SPACING_MEDIUM)
+            .fillMaxWidth(AppConstants.Layout.FILL_MAX_WIDTH)
+    )
+}
+
+
+/**
+ * Component for displaying mantra text with word highlighting
+ *
+ * @param mantraText The complete mantra text to display
+ * @param highlightedWordIndex Index of the currently highlighted word (-1 for no highlight)
+ * @param isAudioPlaying Whether audio is currently playing
+ *
+ * Displays the mantra text with individual word highlighting that can be
+ * synchronized with audio playback for visual feedback.
+ */
+@Composable
+fun MantraHighlightedText(
+    mantraText: String,
+    highlightedWordIndex: Int,
+    isAudioPlaying: Boolean
+) {
+    val words = mantraText.split(" ")
+    val highlightedColor = highlightedTextBGColorMantra // Gold color for highlighting
+    val normalColor = textColorMantra
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(AppConstants.Dimensions.SPACING_MEDIUM),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // First line: हरे कृष्ण, हरे कृष्ण, कृष्ण कृष्ण, हरे हरे|
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            for (i in 0..7) {
+                if (i < words.size) {
+                    val isHighlighted = isAudioPlaying && i == highlightedWordIndex
+                    val textColor = if (isHighlighted) highlightedColor else normalColor
+                    val backgroundColor = if (isHighlighted) highlightedTextColorMantra else Color.Transparent
+
+                    Text(
+                        text = words[i],
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
+                            lineHeight = AppConstants.Typography.LINE_HEIGHT_MANTRA
+                        ),
+                        textAlign = TextAlign.Center,
+                        color = textColor,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .background(
+                                color = backgroundColor,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 4.dp, vertical = 0.dp)
+                    )
+
+                    if (i < 7) {
+                        Spacer(modifier = Modifier.width(0.dp))
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(0.dp))
+
+        // Second line: हरे राम, हरे राम, राम राम, हरे हरे||
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            for (i in 8..15) {
+                if (i < words.size) {
+                    val isHighlighted = isAudioPlaying && i == highlightedWordIndex
+                    val textColor = if (isHighlighted) highlightedColor else normalColor
+                    val backgroundColor = if (isHighlighted) highlightedTextColorMantra else Color.Transparent
+
+                    Text(
+                        text = words[i],
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
+                            lineHeight = AppConstants.Typography.LINE_HEIGHT_MANTRA
+                        ),
+                        textAlign = TextAlign.Center,
+                        color = textColor,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .background(
+                                color = backgroundColor,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 4.dp, vertical = 0.dp)
+                    )
+
+                    if (i < 15) {
+                        Spacer(modifier = Modifier.width(0.dp))
+                    }
+                }
+            }
+        }
     }
 }
 

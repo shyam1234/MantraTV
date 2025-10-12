@@ -17,6 +17,10 @@ val textColorMantra = Color(0xFFF8C786)
 val textColorButton = Color(0xFFD0BCFF)
 val textWhiteColorButton = Color(0xFFFFFFFF)
 
+// text auto chat text color MantraHighlightedText
+val highlightedTextBGColorMantra: Color = Color(0xFFFFD700)
+val highlightedTextColorMantra: Color = Color(0x33FFD700)
+
 //bg color
 val colorBackground = Color(0xFF000000)
 val colorButtonGreen = Color(0x9E014804)
