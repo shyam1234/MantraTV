@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -95,7 +98,11 @@ fun MantraScreenLayout(
             // Top Flash Message
             FlashMessage(
                 flashMessage,
-                modifier = Modifier.basicMarquee(iterations = AppConstants.MARQUEE_ITERATIONS, velocity = AppConstants.MARQUEE_VELOCITY.dp)
+                modifier = Modifier
+                    .basicMarquee(
+                        iterations = AppConstants.MARQUEE_ITERATIONS,
+                        velocity = AppConstants.MARQUEE_VELOCITY.dp
+                    )
                     .constrainAs(flashRef) {
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
@@ -127,7 +134,7 @@ fun MantraScreenLayout(
                 val isAutoChanting by viewModel.isAutoChanting.collectAsState()
                 val isAudioPlaying by viewModel.isAudioPlaying.collectAsState()
                 val currentWordIndex by viewModel.currentWordIndex.collectAsState()
-                
+
                 if (isAutoChanting && isAudioPlaying) {
                     MantraHighlightedText(
                         mantraText = viewModel.getMantraText(),
@@ -229,6 +236,101 @@ private fun MantraLogsSection(
     }
 }
 
+
+
+
+/**
+ * Converts chant feedback state to localized string
+ *
+ * @param chantFeedback The current chant speed feedback state
+ * @return Localized string message for the feedback state
+ *
+ * Maps the ChantFeedback enum to appropriate localized string resources
+ * for displaying user feedback about chanting speed.
+ */
+@Composable
+private fun getChantFeedback(chantFeedback: ChantViewModel.ChantFeedback): String {
+    return when (chantFeedback) {
+        is ChantViewModel.ChantFeedback.Begin -> stringResource(id = R.string.chant_feedback_begin)
+        is ChantViewModel.ChantFeedback.VeryFast -> stringResource(id = R.string.chant_feedback_very_fast)
+        is ChantViewModel.ChantFeedback.Fast -> stringResource(id = R.string.chant_feedback_fast)
+        is ChantViewModel.ChantFeedback.Good -> stringResource(id = R.string.chant_feedback_good)
+        is ChantViewModel.ChantFeedback.SlowThanUsual -> stringResource(id = R.string.chant_feedback_slow_than_usual)
+        is ChantViewModel.ChantFeedback.Slow -> stringResource(id = R.string.chant_feedback_slow)
+        is ChantViewModel.ChantFeedback.VerySlow -> stringResource(id = R.string.chant_feedback_very_slow)
+    }
+}
+
+/**
+ * Displays the control buttons for mantra chanting
+ *
+ * @param viewModel ChantViewModel for state management
+ * @param onIncrement Callback for increment button press
+ * @param onDecrement Callback for decrement button press
+ *
+ * Shows three buttons: decrement (-1), auto-chant toggle, and increment (+1).
+ * Button colors change based on auto-chant state to provide visual feedback.
+ * All buttons now support focus highlighting for better accessibility.
+ **/
+
+@Composable
+private fun MantraButtonsSection(
+    viewModel: ChantViewModel,
+    onIncrement: () -> Unit,
+    onDecrement: () -> Unit
+) {
+    val decrementText = stringResource(id = R.string.decrement_button)
+    val incrementText = stringResource(id = R.string.increment_button)
+    val autoChantOnText = stringResource(id = R.string.auto_chant_on)
+    val autoChantOffText = stringResource(id = R.string.auto_chant_off)
+    val isAutoChanting by viewModel.isAutoChanting.collectAsState()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(AppConstants.Dimensions.SPACING_XLARGE),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        FocusableButton(
+            onClick = onDecrement,
+            containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray,
+            contentColor = if (!isAutoChanting) textWhiteColorButton else textColorButton,
+        ) {
+            Text(
+                text = decrementText,
+                fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+
+       // Auto Chant Toggle Button
+        FocusableButton(
+            onClick = { viewModel.toggleAutoChant() },
+            containerColor = if (isAutoChanting) colorButtonGreen else colorButtonGray,
+            contentColor = if (isAutoChanting) textWhiteColorButton else textColorButton,
+        ) {
+            Text(
+                text = if (isAutoChanting) autoChantOnText else autoChantOffText,
+                fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        FocusableButton(
+            onClick = onIncrement,
+            containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray,
+            contentColor = if (!isAutoChanting) textWhiteColorButton else textColorButton,
+        ) {
+            Text(
+                text = incrementText,
+                fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+}
+
+
 /**
  * Custom focusable button with highlighting
  *
@@ -250,21 +352,19 @@ private fun FocusableButton(
     contentColor: Color,
     content: @Composable () -> Unit
 ) {
-    var isFocused by remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
-    
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
     Button(
         onClick = onClick,
+        interactionSource =  interactionSource,
         modifier = modifier
-            .focusRequester(focusRequester)
-            .focusable()
-            .onFocusChanged { isFocused = it.isFocused }
             .then(
                 if (isFocused) {
                     Modifier.border(
-                        width = 3.dp,
+                        width = 1.dp,
                         color = colorFocusBorder,
-                        shape = RoundedCornerShape(8.dp)
+                        shape = CircleShape
                     )
                 } else {
                     Modifier
@@ -272,14 +372,13 @@ private fun FocusableButton(
             ),
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isFocused) colorFocusHighlight.copy(alpha = 0.3f) else containerColor,
+            containerColor = if (isFocused) containerColor.copy(alpha = 0.3f) else containerColor,
             contentColor = contentColor
         )
     ) {
         content()
     }
 }
-
 
 
 
@@ -292,9 +391,8 @@ private fun FocusableButton(
  *
  * Shows three buttons: decrement (-1), auto-chant toggle, and increment (+1).
  * Button colors change based on auto-chant state to provide visual feedback.
- */
 @Composable
-private fun MantraButtonsSection(
+private fun MantraButtonsSectionOld(
     viewModel: ChantViewModel,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit
@@ -354,92 +452,4 @@ private fun MantraButtonsSection(
         }
     }
 }
-
-/**
- * Displays the control buttons for mantra chanting
- *
- * @param viewModel ChantViewModel for state management
- * @param onIncrement Callback for increment button press
- * @param onDecrement Callback for decrement button press
- *
- * Shows three buttons: decrement (-1), auto-chant toggle, and increment (+1).
- * Button colors change based on auto-chant state to provide visual feedback.
- * All buttons now support focus highlighting for better accessibility.
-@Composable
-private fun MantraButtonsSection(
-    viewModel: ChantViewModel,
-    onIncrement: () -> Unit,
-    onDecrement: () -> Unit
-) {
-    val decrementText = stringResource(id = R.string.decrement_button)
-    val incrementText = stringResource(id = R.string.increment_button)
-    val autoChantOnText = stringResource(id = R.string.auto_chant_on)
-    val autoChantOffText = stringResource(id = R.string.auto_chant_off)
-    val isAutoChanting by viewModel.isAutoChanting.collectAsState()
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(AppConstants.Dimensions.SPACING_XLARGE),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        FocusableButton(
-            onClick = onDecrement,
-            containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray,
-            contentColor = if (!isAutoChanting) textWhiteColorButton else textColorButton,
-        ) {
-            Text(
-                text = decrementText,
-                fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-
-        // Auto Chant Toggle Button
-        FocusableButton(
-            onClick = { viewModel.toggleAutoChant() },
-            containerColor = if (isAutoChanting) colorButtonGreen else colorButtonGray,
-            contentColor = if (isAutoChanting) textWhiteColorButton else textColorButton,
-        ) {
-            Text(
-                text = if (isAutoChanting) autoChantOnText else autoChantOffText,
-                fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        FocusableButton(
-            onClick = onIncrement,
-            containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray,
-            contentColor = if (!isAutoChanting) textWhiteColorButton else textColorButton,
-        ) {
-            Text(
-                text = incrementText,
-                fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-    }
-}*/
-
-/**
- * Converts chant feedback state to localized string
- *
- * @param chantFeedback The current chant speed feedback state
- * @return Localized string message for the feedback state
- *
- * Maps the ChantFeedback enum to appropriate localized string resources
- * for displaying user feedback about chanting speed.
- */
-@Composable
-private fun getChantFeedback(chantFeedback: ChantViewModel.ChantFeedback): String {
-    return when (chantFeedback) {
-        is ChantViewModel.ChantFeedback.Begin -> stringResource(id = R.string.chant_feedback_begin)
-        is ChantViewModel.ChantFeedback.VeryFast -> stringResource(id = R.string.chant_feedback_very_fast)
-        is ChantViewModel.ChantFeedback.Fast -> stringResource(id = R.string.chant_feedback_fast)
-        is ChantViewModel.ChantFeedback.Good -> stringResource(id = R.string.chant_feedback_good)
-        is ChantViewModel.ChantFeedback.SlowThanUsual -> stringResource(id = R.string.chant_feedback_slow_than_usual)
-        is ChantViewModel.ChantFeedback.Slow -> stringResource(id = R.string.chant_feedback_slow)
-        is ChantViewModel.ChantFeedback.VerySlow -> stringResource(id = R.string.chant_feedback_very_slow)
-    }
-} 
+*/

@@ -28,7 +28,7 @@ val colorGreen = Color(0x9E18561A)
 val colorYellow = Color(0x9EA4822F)
 
 //Focus highlighting colors
-val colorFocusHighlight = Color(0xFFFFD700) // Gold color for focus
+val colorFocusHighlight = Color(0x9E18561A) // Gold color for focus
 val colorFocusBorder = Color(0xFFFFA500) // Orange border for focus
 
 
