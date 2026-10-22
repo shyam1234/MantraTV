@@ -9,4 +9,18 @@
     <string name="chant_feedback_slow_than_usual">少し遅く唱えています！</string>
     <string name="chant_feedback_slow">遅く唱えています！</string>
     <string name="chant_feedback_very_slow">とても遅く唱えています！</string>
+    <string name="settings_button">設定</string>
+    <string name="chant_speed_title">唱える速さ</string>
+    <string name="chant_speed_slower">遅く</string>
+    <string name="chant_speed_faster_button">速く</string>
+    <string name="chant_speed_saved">この速さは初期設定として保存されます。</string>
+    <string name="chant_speed_close">閉じる</string>
+    <string name="chant_speed_very_slow">とても遅い</string>
+    <string name="chant_speed_slow">遅い</string>
+    <string name="chant_speed_normal">普通</string>
+    <string name="chant_speed_fast">速い</string>
+    <string name="chant_speed_very_fast">とても速い</string>
+    <string name="chant_speed_faster">より速い</string>
+    <string name="chant_speed_fastest">最速</string>
+    <string name="chant_speed_value">%1$s · %2$s×</string>
 </resources>

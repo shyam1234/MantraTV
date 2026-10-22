@@ -9,5 +9,19 @@
     <string name="chant_feedback_slow_than_usual">你念得比平时慢一点！</string>
     <string name="chant_feedback_slow">你念得很慢！</string>
     <string name="chant_feedback_very_slow">你念得非常慢！</string>
+    <string name="settings_button">设置</string>
+    <string name="chant_speed_title">念诵速度</string>
+    <string name="chant_speed_slower">更慢</string>
+    <string name="chant_speed_faster_button">更快</string>
+    <string name="chant_speed_saved">此速度已保存为默认。</string>
+    <string name="chant_speed_close">关闭</string>
+    <string name="chant_speed_very_slow">很慢</string>
+    <string name="chant_speed_slow">慢</string>
+    <string name="chant_speed_normal">正常</string>
+    <string name="chant_speed_fast">快</string>
+    <string name="chant_speed_very_fast">很快</string>
+    <string name="chant_speed_faster">更快</string>
+    <string name="chant_speed_fastest">最快</string>
+    <string name="chant_speed_value">%1$s · %2$s×</string>
 </resources>
 

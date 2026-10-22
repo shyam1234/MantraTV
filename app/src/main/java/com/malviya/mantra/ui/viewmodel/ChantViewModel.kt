@@ -10,6 +10,8 @@ import com.malviya.mantra.firebase.logManualChant
 import com.malviya.mantra.firebase.logSampurnaMala
 import com.malviya.mantra.speech.AudioManager
 import com.malviya.mantra.ui.screen.ChantLog
+import com.malviya.mantra.ui.settings.ChantSpeedStore
+import com.malviya.mantra.ui.settings.ChantSpeeds
 import com.malviya.mantra.ui.theme.colorButtonGray
 import com.malviya.mantra.ui.theme.colorGreen
 import com.malviya.mantra.ui.theme.colorRed
@@ -116,6 +118,12 @@ class ChantViewModel : ViewModel() {
     private val _isAudioReady = MutableStateFlow(false)
     val isAudioReady: StateFlow<Boolean> = _isAudioReady.asStateFlow()
 
+    /** Saved auto-chant playback speed. 1.0 is the recorded pace. */
+    private val _chantSpeed = MutableStateFlow(ChantSpeeds.DEFAULT)
+    val chantSpeed: StateFlow<Float> = _chantSpeed.asStateFlow()
+
+    private var appContext: Context? = null
+
     // ==================== PRIVATE VARIABLES ====================
     
     /** Start time of the current mala round */
@@ -146,8 +154,12 @@ class ChantViewModel : ViewModel() {
      * @param context Application context for audio initialization
      */
     fun initializeAudioManager(context: Context) {
+        val applicationContext = context.applicationContext
+        appContext = applicationContext
+        val savedSpeed = ChantSpeedStore.read(applicationContext)
+        _chantSpeed.value = savedSpeed
         if (audioManager == null) {
-            audioManager = AudioManager(context)
+            audioManager = AudioManager(applicationContext, savedSpeed)
             
             // Set callback for audio completion to increment counter
             audioManager?.setOnAudioCompleteCallback {
@@ -194,6 +206,16 @@ class ChantViewModel : ViewModel() {
             audioManager?.stopAudio()
         }
         logAutoChant(_isAutoChanting.value)
+    }
+
+    /**
+     * Sets the auto-chant speed and stores it as the default for the next launch.
+     */
+    fun setChantSpeed(speed: Float) {
+        val snapped = ChantSpeeds.nearest(speed)
+        _chantSpeed.value = snapped
+        audioManager?.setPlaybackSpeed(snapped)
+        appContext?.let { ChantSpeedStore.write(it, snapped) }
     }
 
 

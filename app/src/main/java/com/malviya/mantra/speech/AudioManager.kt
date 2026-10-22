@@ -2,7 +2,9 @@ package com.malviya.mantra.speech
 
 import android.content.Context
 import android.media.MediaPlayer
+import android.media.PlaybackParams
 import com.malviya.mantra.ui.constants.AppConstants
+import com.malviya.mantra.ui.settings.ChantSpeeds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,9 +17,13 @@ import java.io.InputStreamReader
  * Manages MediaPlayer for audio playback and synchronizes word highlighting
  * based on a timing file (TTF) that contains timestamps and word indices.
  */
-class AudioManager(private val context: Context) {
+class AudioManager(
+    private val context: Context,
+    initialSpeed: Float = ChantSpeeds.DEFAULT
+) {
     
     private var mediaPlayer: MediaPlayer? = null
+    private var playbackSpeed = ChantSpeeds.nearest(initialSpeed)
     private var timingData: List<TimingEntry> = emptyList()
     private var internalWordIndex = 0
     private var isLoopingAudio = false
@@ -74,6 +80,7 @@ class AudioManager(private val context: Context) {
                         //Timber.d("Audio prepared successfully")
                         _isAudioReady.value = true
                         loadTimingData()
+                        applyPlaybackSpeed()
                     }
                     
                     setOnCompletionListener {
@@ -148,6 +155,7 @@ class AudioManager(private val context: Context) {
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                 _isAudioReady.value = true
                 loadTimingData()
+                applyPlaybackSpeed()
             }, 1000)
             
         } catch (e: Exception) {
@@ -219,6 +227,7 @@ class AudioManager(private val context: Context) {
         try {
             mediaPlayer?.let { player ->
                 if (!player.isPlaying) {
+                    applyPlaybackSpeed()
                     player.start()
                     _isAudioPlaying.value = true
                     isLoopingAudio = true
@@ -255,7 +264,7 @@ class AudioManager(private val context: Context) {
         // Simulate word progression
         Thread {
             var currentTime = 0L
-            val totalDuration = AppConstants.IDLE_TIME_FOR_ONE_BEAD // ms for complete mantra
+            val totalDuration = (AppConstants.IDLE_TIME_FOR_ONE_BEAD / playbackSpeed).toLong()
             
             while (_isAudioPlaying.value && isLoopingAudio) {
                 try {
@@ -329,6 +338,7 @@ class AudioManager(private val context: Context) {
         try {
             mediaPlayer?.let { player ->
                 player.seekTo(0)
+                applyPlaybackSpeed()
                 player.start()
                 internalWordIndex = 0
                 _currentWordIndex.value = 0
@@ -407,6 +417,23 @@ class AudioManager(private val context: Context) {
         return mantraWords.size
     }
     
+    /**
+     * Changes how fast one mantra cycle plays. 1.0 is the recorded pace.
+     */
+    fun setPlaybackSpeed(speed: Float) {
+        playbackSpeed = ChantSpeeds.nearest(speed)
+        applyPlaybackSpeed()
+    }
+
+    private fun applyPlaybackSpeed() {
+        if (!_isAudioReady.value) return
+        try {
+            mediaPlayer?.playbackParams = PlaybackParams().setSpeed(playbackSpeed)
+        } catch (e: Exception) {
+            // Some devices reject a speed change until playback has started.
+        }
+    }
+
     /**
      * Releases audio resources
      */

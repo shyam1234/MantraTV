@@ -14,4 +14,18 @@
     <string name="chant_feedback_very_slow">आप बहुत धीमे जाप कर रहे हैं!</string>
     <string name="auto_chant_on">ऑटो जाप चालू</string>
     <string name="auto_chant_off">ऑटो जाप बंद</string>
+    <string name="settings_button">सेटिंग्स</string>
+    <string name="chant_speed_title">जाप की गति</string>
+    <string name="chant_speed_slower">और धीमा</string>
+    <string name="chant_speed_faster_button">और तेज़</string>
+    <string name="chant_speed_saved">यह गति डिफ़ॉल्ट के रूप में सहेज ली गई है।</string>
+    <string name="chant_speed_close">बंद करें</string>
+    <string name="chant_speed_very_slow">बहुत धीमा</string>
+    <string name="chant_speed_slow">धीमा</string>
+    <string name="chant_speed_normal">सामान्य</string>
+    <string name="chant_speed_fast">तेज़</string>
+    <string name="chant_speed_very_fast">बहुत तेज़</string>
+    <string name="chant_speed_faster">तेज़तर</string>
+    <string name="chant_speed_fastest">सबसे तेज़</string>
+    <string name="chant_speed_value">%1$s · %2$s×</string>
 </resources>

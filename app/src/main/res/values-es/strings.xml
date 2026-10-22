@@ -9,4 +9,18 @@
     <string name="chant_feedback_slow_than_usual">¡Estás cantando un poco más lento de lo habitual!</string>
     <string name="chant_feedback_slow">¡Estás cantando lento!</string>
     <string name="chant_feedback_very_slow">¡Estás cantando muy lento!</string>
+    <string name="settings_button">Ajustes</string>
+    <string name="chant_speed_title">Velocidad del canto</string>
+    <string name="chant_speed_slower">Más lento</string>
+    <string name="chant_speed_faster_button">Más rápido</string>
+    <string name="chant_speed_saved">Esta velocidad se guarda como predeterminada.</string>
+    <string name="chant_speed_close">Cerrar</string>
+    <string name="chant_speed_very_slow">Muy lento</string>
+    <string name="chant_speed_slow">Lento</string>
+    <string name="chant_speed_normal">Normal</string>
+    <string name="chant_speed_fast">Rápido</string>
+    <string name="chant_speed_very_fast">Muy rápido</string>
+    <string name="chant_speed_faster">Más rápido</string>
+    <string name="chant_speed_fastest">Máxima</string>
+    <string name="chant_speed_value">%1$s · %2$s×</string>
 </resources>

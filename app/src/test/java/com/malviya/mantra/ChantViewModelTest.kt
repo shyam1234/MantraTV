@@ -104,6 +104,14 @@ class ChantViewModelTest {
     }
 
     @Test
+    fun `setChantSpeed keeps a supported speed`() = runTest {
+        viewModel.setChantSpeed(1.3f)
+        assertEquals(1.25f, viewModel.chantSpeed.value, 0.001f)
+        viewModel.setChantSpeed(0.2f)
+        assertEquals(0.5f, viewModel.chantSpeed.value, 0.001f)
+    }
+
+    @Test
     fun `convertMillisToReadableTime formats correctly`() {
         assertEquals("01:01:01 hr", viewModel.convertMillisToReadableTime(3661000))
         assertEquals("01:01 min", viewModel.convertMillisToReadableTime(61000))

@@ -13,21 +13,27 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -75,6 +81,7 @@ fun MantraScreenLayout(
     val sampurnamalaFormat = context.getString(R.string.sampurnamala)
     val suggestion = getChantFeedback(chantFeedback)
     val screenFit = rememberScreenFit()
+    var showSettings by remember { mutableStateOf(false) }
 
     CompositionLocalProvider(LocalScreenFit provides screenFit) {
         DynamicBackground {
@@ -94,15 +101,21 @@ fun MantraScreenLayout(
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    FlashMessage(
-                        flashMessage,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .basicMarquee(
-                                iterations = AppConstants.MARQUEE_ITERATIONS,
-                                velocity = AppConstants.MARQUEE_VELOCITY.dp
-                            )
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        FlashMessage(
+                            flashMessage,
+                            modifier = Modifier
+                                .weight(1f)
+                                .basicMarquee(
+                                    iterations = AppConstants.MARQUEE_ITERATIONS,
+                                    velocity = AppConstants.MARQUEE_VELOCITY.dp
+                                )
+                        )
+                        SettingsIconButton(onClick = { showSettings = true })
+                    }
 
                     val isAutoChanting by viewModel.isAutoChanting.collectAsState()
                     val isAudioPlaying by viewModel.isAudioPlaying.collectAsState()
@@ -155,6 +168,13 @@ fun MantraScreenLayout(
                 )
             }
         }
+    }
+
+    if (showSettings) {
+        ChantSpeedDialog(
+            viewModel = viewModel,
+            onDismiss = { showSettings = false }
+        )
     }
 }
 
@@ -271,7 +291,6 @@ private fun MantraButtonsSection(
         horizontal = fit.buttonHorizontalPadding,
         vertical = fit.buttonVerticalPadding
     )
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -330,6 +349,32 @@ private fun MantraButtonsSection(
     }
 }
 
+
+@Composable
+private fun SettingsIconButton(onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    IconButton(
+        onClick = onClick,
+        interactionSource = interactionSource,
+        modifier = Modifier
+            .size(40.dp)
+            .then(
+                if (isFocused) {
+                    Modifier.border(width = 2.dp, color = colorFocusBorder, shape = CircleShape)
+                } else {
+                    Modifier
+                }
+            )
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_settings),
+            contentDescription = stringResource(id = R.string.settings_button),
+            tint = textWhiteColorButton,
+            modifier = Modifier.size(22.dp)
+        )
+    }
+}
 
 /**
  * Custom focusable button with highlighting

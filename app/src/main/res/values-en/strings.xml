@@ -12,4 +12,18 @@
     <string name="chant_feedback_very_slow">You are chanting very slow!</string>
     <string name="auto_chant_on">Auto Chant On</string>
     <string name="auto_chant_off">Auto Chant Off</string>
+    <string name="settings_button">Settings</string>
+    <string name="chant_speed_title">Chant speed</string>
+    <string name="chant_speed_slower">Slower</string>
+    <string name="chant_speed_faster_button">Faster</string>
+    <string name="chant_speed_saved">This speed is saved as the default.</string>
+    <string name="chant_speed_close">Close</string>
+    <string name="chant_speed_very_slow">Very slow</string>
+    <string name="chant_speed_slow">Slow</string>
+    <string name="chant_speed_normal">Normal</string>
+    <string name="chant_speed_fast">Fast</string>
+    <string name="chant_speed_very_fast">Very fast</string>
+    <string name="chant_speed_faster">Faster</string>
+    <string name="chant_speed_fastest">Fastest</string>
+    <string name="chant_speed_value">%1$s · %2$s×</string>
 </resources>
