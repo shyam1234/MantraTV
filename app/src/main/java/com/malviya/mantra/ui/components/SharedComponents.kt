@@ -5,18 +5,22 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -26,9 +30,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.malviya.mantra.R
 import com.malviya.mantra.ui.constants.AppConstants
 import com.malviya.mantra.ui.screen.ChantLog
@@ -70,93 +74,86 @@ fun MantraScreenLayout(
     val buildNumber = context.packageManager.getPackageInfo(context.packageName, 0).versionName
     val sampurnamalaFormat = context.getString(R.string.sampurnamala)
     val suggestion = getChantFeedback(chantFeedback)
+    val screenFit = rememberScreenFit()
 
-    DynamicBackground {
-        ConstraintLayout(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            val (flashRef, contentRef, watermarkRef) = createRefs()
-
-            // Top Flash Message
-            FlashMessage(
-                flashMessage,
-                modifier = Modifier
-                    .basicMarquee(
-                        iterations = AppConstants.MARQUEE_ITERATIONS,
-                        velocity = AppConstants.MARQUEE_VELOCITY.dp
-                    )
-                    .constrainAs(flashRef) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-
-                    }
-                    .padding(bottom = AppConstants.Dimensions.SPACING_TINY)
-            )
-
-            // Scrollable Center Content
+    CompositionLocalProvider(LocalScreenFit provides screenFit) {
+        DynamicBackground {
             Column(
                 modifier = Modifier
-                    .constrainAs(contentRef) {
-                        top.linkTo(flashRef.bottom)
-                        bottom.linkTo(watermarkRef.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        height = Dimension.fillToConstraints
-                    }
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
                     .padding(
-                        start = AppConstants.Dimensions.SPACING_TINY,
-                        end = AppConstants.Dimensions.SPACING_TINY,
-                        top = AppConstants.Dimensions.SPACING_TINY,
-                        bottom = AppConstants.Dimensions.SPACING_TINY
-                    )
+                        horizontal = screenFit.horizontalPadding,
+                        vertical = screenFit.verticalPadding
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Use highlighted text when auto-chant is active, otherwise use regular mantra render
-                val isAutoChanting by viewModel.isAutoChanting.collectAsState()
-                val isAudioPlaying by viewModel.isAudioPlaying.collectAsState()
-                val currentWordIndex by viewModel.currentWordIndex.collectAsState()
-
-                if (isAutoChanting && isAudioPlaying) {
-                    MantraHighlightedText(
-                        mantraText = viewModel.getMantraText(),
-                        highlightedWordIndex = currentWordIndex,
-                        isAudioPlaying = isAudioPlaying
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    FlashMessage(
+                        flashMessage,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .basicMarquee(
+                                iterations = AppConstants.MARQUEE_ITERATIONS,
+                                velocity = AppConstants.MARQUEE_VELOCITY.dp
+                            )
                     )
-                } else {
-                    MantraRender(name)
+
+                    val isAutoChanting by viewModel.isAutoChanting.collectAsState()
+                    val isAudioPlaying by viewModel.isAudioPlaying.collectAsState()
+                    val currentWordIndex by viewModel.currentWordIndex.collectAsState()
+
+                    if (isAutoChanting && isAudioPlaying) {
+                        MantraHighlightedText(
+                            mantraText = viewModel.getMantraText(),
+                            highlightedWordIndex = currentWordIndex,
+                            isAudioPlaying = isAudioPlaying
+                        )
+                    } else {
+                        MantraRender(name)
+                    }
+
+                    MantraLogsSection(
+                        chantLogs = chantLogs,
+                        sampurnamalaFormat = sampurnamalaFormat,
+                        suggestion = suggestion,
+                        viewModel = viewModel
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        centerContent()
+                    }
                 }
-
-                MantraLogsSection(
-                    chantLogs = chantLogs,
-                    sampurnamalaFormat = sampurnamalaFormat,
-                    suggestion = suggestion,
-                    viewModel = viewModel
-                )
-
-                centerContent()
 
                 MantraButtonsSection(
                     viewModel = viewModel,
                     onIncrement = onIncrement,
                     onDecrement = onDecrement
                 )
-            }
 
-            // Bottom Watermark
-            Text(
-                text = "$poweredBy ${AppConstants.UI.WATERMARK_SEPARATOR} ${AppConstants.UI.WATERMARK_PREFIX}$buildNumber",
-                color = textColorPowerBy,
-                fontSize = AppConstants.Typography.FONT_SIZE_TINY,
-                fontWeight = FontWeight.Light,
-                modifier = Modifier
-                    .constrainAs(watermarkRef) {
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .padding(bottom = AppConstants.Dimensions.SPACING_TINY)
-            )
+                Text(
+                    text = "$poweredBy ${AppConstants.UI.WATERMARK_PREFIX}$buildNumber",
+                    color = textColorPowerBy,
+                    fontSize = screenFit.watermarkFontSize,
+                    fontWeight = FontWeight.Light,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = screenFit.itemSpacing)
+                )
+            }
         }
     }
 }
@@ -180,38 +177,41 @@ private fun MantraLogsSection(
     suggestion: String,
     viewModel: ChantViewModel
 ) {
+    val fit = LocalScreenFit.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(AppConstants.Dimensions.SPACING_MEDIUM),
+            .padding(vertical = fit.itemSpacing),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (chantLogs.isNotEmpty()) {
+        val logText = if (chantLogs.isNotEmpty()) {
             val totalTime = viewModel.convertMillisToReadableTime(chantLogs.last().totalTime)
-            Text(
-                text = sampurnamalaFormat.format(
-                    chantLogs.last().malaNumber,
-                    totalTime
-                ),
-                Modifier.padding(AppConstants.Dimensions.SPACING_SMALL),
-                fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
-                color = textColorSuggestion,
-                fontWeight = FontWeight.Bold
-            )
+            sampurnamalaFormat.format(chantLogs.last().malaNumber, totalTime)
         } else {
-            Text(
-                text = " ",
-                Modifier.padding(AppConstants.Dimensions.SPACING_SMALL),
-                fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
-                color = textColorSuggestion,
-                fontWeight = FontWeight.Bold
-            )
+            " "
         }
+        Text(
+            text = logText,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = fit.itemSpacing),
+            fontSize = fit.logFontSize,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            color = textColorSuggestion,
+            fontWeight = FontWeight.Bold
+        )
 
         Text(
             text = suggestion,
-            fontSize = AppConstants.Typography.FONT_SIZE_MEDIUM,
-            modifier = Modifier.padding(AppConstants.Dimensions.SPACING_XXLARGE),
+            fontSize = fit.feedbackFontSize,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = fit.itemSpacing),
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
             color = textColorSuggestion,
             fontWeight = FontWeight.Bold
         )
@@ -266,47 +266,65 @@ private fun MantraButtonsSection(
     val autoChantOnText = stringResource(id = R.string.auto_chant_on)
     val autoChantOffText = stringResource(id = R.string.auto_chant_off)
     val isAutoChanting by viewModel.isAutoChanting.collectAsState()
+    val fit = LocalScreenFit.current
+    val buttonPadding = PaddingValues(
+        horizontal = fit.buttonHorizontalPadding,
+        vertical = fit.buttonVerticalPadding
+    )
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(AppConstants.Dimensions.SPACING_XLARGE),
-        horizontalArrangement = Arrangement.SpaceEvenly
+            .padding(vertical = fit.itemSpacing),
+        horizontalArrangement = Arrangement.spacedBy(fit.itemSpacing),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         FocusableButton(
             onClick = onDecrement,
+            modifier = Modifier.weight(1f),
             containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray,
             contentColor = if (!isAutoChanting) textWhiteColorButton else textColorButton,
+            contentPadding = buttonPadding,
         ) {
             Text(
                 text = decrementText,
-                fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
+                fontSize = fit.buttonFontSize,
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
             )
         }
 
-       // Auto Chant Toggle Button
         FocusableButton(
             onClick = { viewModel.toggleAutoChant() },
+            modifier = Modifier.weight(1.4f),
             containerColor = if (isAutoChanting) colorButtonGreen else colorButtonGray,
             contentColor = if (isAutoChanting) textWhiteColorButton else textColorButton,
+            contentPadding = buttonPadding,
         ) {
             Text(
                 text = if (isAutoChanting) autoChantOnText else autoChantOffText,
-                fontSize = AppConstants.Typography.FONT_SIZE_LARGE,
-                fontWeight = FontWeight.Bold
+                fontSize = fit.autoChantFontSize,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
         FocusableButton(
             onClick = onIncrement,
+            modifier = Modifier.weight(1f),
             containerColor = if (!isAutoChanting) colorButtonGreen else colorButtonGray,
             contentColor = if (!isAutoChanting) textWhiteColorButton else textColorButton,
+            contentPadding = buttonPadding,
         ) {
             Text(
                 text = incrementText,
-                fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
+                fontSize = fit.buttonFontSize,
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
             )
         }
     }
@@ -332,6 +350,7 @@ private fun FocusableButton(
     enabled: Boolean = true,
     containerColor: Color,
     contentColor: Color,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable () -> Unit
 ) {
 
@@ -339,8 +358,9 @@ private fun FocusableButton(
     val isFocused by interactionSource.collectIsFocusedAsState()
     Button(
         onClick = onClick,
-        interactionSource =  interactionSource,
+        interactionSource = interactionSource,
         modifier = modifier
+            .fillMaxWidth()
             .then(
                 if (isFocused) {
                     Modifier.border(
@@ -353,6 +373,7 @@ private fun FocusableButton(
                 }
             ),
         enabled = enabled,
+        contentPadding = contentPadding,
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isFocused) containerColor.copy(alpha = 0.3f) else containerColor,
             contentColor = contentColor

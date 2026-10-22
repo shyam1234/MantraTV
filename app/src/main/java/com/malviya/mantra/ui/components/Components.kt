@@ -4,14 +4,14 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.malviya.mantra.ui.constants.AppConstants
 import com.malviya.mantra.ui.theme.highlightedTextBGColorMantra
 import com.malviya.mantra.ui.theme.highlightedTextColorMantra
@@ -95,41 +96,47 @@ fun GrayCircleWithNumber2(count: Int, color: Color) {
         circleColors[count - 1] = color
     }
 
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        // Main circle with the count in center
-        Canvas(modifier = Modifier.size(AppConstants.Dimensions.CIRCLE_MAIN_SIZE)) {
-            drawCircle(
-                color = color,
-                radius = size.minDimension * AppConstants.Layout.CIRCLE_RADIUS_FACTOR,
-                center = Offset(size.width * AppConstants.Layout.CENTER_ALIGNMENT, size.height * AppConstants.Layout.CENTER_ALIGNMENT)
-            )
-        }
-
-        // Display current count in center
-        Text(
-            text = "$count",
-            fontSize = AppConstants.Typography.FONT_SIZE_COUNTER,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-        // Small colored circles forming a border around the main circle
-        Canvas(modifier = Modifier.size(AppConstants.Dimensions.CIRCLE_BORDER_SIZE)) {
-            val circleRadius = AppConstants.Dimensions.SMALL_CIRCLE_RADIUS.toPx()
-            val bigCircleRadius = size.minDimension * AppConstants.Layout.CIRCLE_RADIUS_FACTOR - circleRadius
-
-            // Draw bead indicator circles based on the count
-            for (i in 0 until count.coerceAtMost(AppConstants.ONE_MALA_ROUND_COUNT)) {
-                if (count > 0) {
-                    val angle = (i * 2 * Math.PI / AppConstants.ONE_MALA_ROUND_COUNT).toFloat()
-                    val x = bigCircleRadius * cos(angle) + size.width * AppConstants.Layout.CENTER_ALIGNMENT
-                    val y = bigCircleRadius * sin(angle) + size.height * AppConstants.Layout.CENTER_ALIGNMENT
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        val available = minOf(maxWidth, maxHeight)
+        if (available > 1.dp) {
+            val outer = available * 0.92f
+            val beadRadius = (outer * 0.02f).coerceIn(2.dp, 7.dp)
+            Box(Modifier.size(outer), contentAlignment = Alignment.Center) {
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(beadRadius)
+                ) {
                     drawCircle(
-                        color = circleColors[i],
-                        radius = circleRadius,
-                        center = Offset(x, y)
+                        color = color,
+                        radius = size.minDimension / 2f,
+                        center = Offset(size.width / 2f, size.height / 2f)
                     )
+                }
+
+                Text(
+                    text = "$count",
+                    fontSize = (outer.value * 0.22f).coerceIn(18f, 64f).sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val circleRadius = beadRadius.toPx()
+                    val orbit = size.minDimension / 2f - circleRadius
+                    for (i in 0 until count.coerceAtMost(AppConstants.ONE_MALA_ROUND_COUNT)) {
+                        val angle = (i * 2 * Math.PI / AppConstants.ONE_MALA_ROUND_COUNT).toFloat()
+                        val x = orbit * cos(angle) + size.width / 2f
+                        val y = orbit * sin(angle) + size.height / 2f
+                        drawCircle(
+                            color = circleColors[i],
+                            radius = circleRadius,
+                            center = Offset(x, y)
+                        )
+                    }
                 }
             }
         }
@@ -152,8 +159,9 @@ fun FlashMessage(message: String, modifier: Modifier) {
         Text(
             message,
             maxLines = AppConstants.UI.MAX_LINES_FLASH_MESSAGE,
+            softWrap = false,
             color = Color.White,
-            fontSize = AppConstants.Typography.FONT_SIZE_SMALL,
+            fontSize = LocalScreenFit.current.flashFontSize,
             fontWeight = FontWeight.Bold
         )
     }
@@ -170,18 +178,19 @@ fun FlashMessage(message: String, modifier: Modifier) {
  */
 @Composable
 fun MantraRender(name: String) {
+    val fit = LocalScreenFit.current
     Text(
         text = name,
         style = MaterialTheme.typography.titleLarge.copy(
-            fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
-            lineHeight = AppConstants.Typography.LINE_HEIGHT_MANTRA
+            fontSize = fit.mantraFontSize,
+            lineHeight = fit.mantraLineHeight
         ),
         textAlign = TextAlign.Center,
         color = textColorMantra,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
-            .padding(AppConstants.Dimensions.SPACING_MEDIUM)
-            .fillMaxWidth(AppConstants.Layout.FILL_MAX_WIDTH)
+            .padding(horizontal = fit.itemSpacing, vertical = fit.itemSpacing)
+            .fillMaxWidth()
     )
 }
 
@@ -196,6 +205,7 @@ fun MantraRender(name: String) {
  * Displays the mantra text with individual word highlighting that can be
  * synchronized with audio playback for visual feedback.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MantraHighlightedText(
     mantraText: String,
@@ -203,84 +213,74 @@ fun MantraHighlightedText(
     isAudioPlaying: Boolean
 ) {
     val words = mantraText.split(" ")
-    val highlightedColor = highlightedTextBGColorMantra // Gold color for highlighting
+    val fit = LocalScreenFit.current
+    val highlightedColor = highlightedTextBGColorMantra
     val normalColor = textColorMantra
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(AppConstants.Dimensions.SPACING_MEDIUM),
+            .padding(horizontal = fit.itemSpacing, vertical = fit.itemSpacing),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // First line: हरे कृष्ण, हरे कृष्ण, कृष्ण कृष्ण, हरे हरे|
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            for (i in 0..7) {
-                if (i < words.size) {
-                    val isHighlighted = isAudioPlaying && i == highlightedWordIndex
-                    val textColor = if (isHighlighted) highlightedColor else normalColor
-                    val backgroundColor = if (isHighlighted) highlightedTextColorMantra else Color.Transparent
+        MantraWordRow(
+            words = words,
+            startIndex = 0,
+            endIndex = 7,
+            highlightedWordIndex = highlightedWordIndex,
+            isAudioPlaying = isAudioPlaying,
+            highlightedColor = highlightedColor,
+            normalColor = normalColor,
+            fit = fit
+        )
+        MantraWordRow(
+            words = words,
+            startIndex = 8,
+            endIndex = 15,
+            highlightedWordIndex = highlightedWordIndex,
+            isAudioPlaying = isAudioPlaying,
+            highlightedColor = highlightedColor,
+            normalColor = normalColor,
+            fit = fit
+        )
+    }
+}
 
-                    Text(
-                        text = words[i],
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
-                            lineHeight = AppConstants.Typography.LINE_HEIGHT_MANTRA
-                        ),
-                        textAlign = TextAlign.Center,
-                        color = textColor,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .background(
-                                color = backgroundColor,
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(horizontal = 5.dp, vertical = 0.dp)
-                    )
-
-                    if (i < 7) {
-                        Spacer(modifier = Modifier.width(0.dp))
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(0.dp))
-
-        // Second line: हरे राम, हरे राम, राम राम, हरे हरे||
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            for (i in 8..15) {
-                if (i < words.size) {
-                    val isHighlighted = isAudioPlaying && i == highlightedWordIndex
-                    val textColor = if (isHighlighted) highlightedColor else normalColor
-                    val backgroundColor = if (isHighlighted) highlightedTextColorMantra else Color.Transparent
-
-                    Text(
-                        text = words[i],
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontSize = AppConstants.Typography.FONT_SIZE_XXLARGE,
-                            lineHeight = AppConstants.Typography.LINE_HEIGHT_MANTRA
-                        ),
-                        textAlign = TextAlign.Center,
-                        color = textColor,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .background(
-                                color = backgroundColor,
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(horizontal = 5.dp, vertical = 0.dp)
-                    )
-
-                    if (i < 15) {
-                        Spacer(modifier = Modifier.width(0.dp))
-                    }
-                }
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MantraWordRow(
+    words: List<String>,
+    startIndex: Int,
+    endIndex: Int,
+    highlightedWordIndex: Int,
+    isAudioPlaying: Boolean,
+    highlightedColor: Color,
+    normalColor: Color,
+    fit: ScreenFit
+) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        for (i in startIndex..endIndex) {
+            if (i < words.size) {
+                val isHighlighted = isAudioPlaying && i == highlightedWordIndex
+                Text(
+                    text = words[i],
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = fit.mantraFontSize,
+                        lineHeight = fit.mantraLineHeight
+                    ),
+                    textAlign = TextAlign.Center,
+                    color = if (isHighlighted) highlightedColor else normalColor,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .background(
+                            color = if (isHighlighted) highlightedTextColorMantra else Color.Transparent,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = fit.wordGap, vertical = 0.dp)
+                )
             }
         }
     }
