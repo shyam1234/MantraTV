@@ -13,8 +13,8 @@ android {
         applicationId = "com.malviya.mantra"
         minSdk = 24
         targetSdk = 36
-        versionCode = 26
-        versionName = "1.0.26"
+        versionCode = 27
+        versionName = "26.10.22"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
