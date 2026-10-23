@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mantra"
-        tools:targetApi="35">
+        tools:targetApi="36">
 
         <meta-data
             android:name="android.locale_config"
