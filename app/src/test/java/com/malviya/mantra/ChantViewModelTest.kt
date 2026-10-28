@@ -2,7 +2,9 @@ package com.malviya.mantra
 
 
 import com.malviya.mantra.ui.constants.AppConstants
+import com.malviya.mantra.ui.theme.colorRed
 import com.malviya.mantra.ui.viewmodel.ChantViewModel
+import com.malviya.mantra.ui.viewmodel.paceFeedback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -101,6 +103,23 @@ class ChantViewModelTest {
         assertTrue(viewModel.chantFeedback.value is ChantViewModel.ChantFeedback.Good)
         viewModel.getCircleColor(7000)
         assertTrue(viewModel.chantFeedback.value is ChantViewModel.ChantFeedback.Slow)
+    }
+
+    @Test
+    fun `double speed is very fast against the recorded chant`() {
+        val recordedCycleMs = 7080L
+        assertTrue(paceFeedback(recordedCycleMs, recordedCycleMs) is ChantViewModel.ChantFeedback.Good)
+        assertTrue(paceFeedback(recordedCycleMs / 2, recordedCycleMs) is ChantViewModel.ChantFeedback.VeryFast)
+        assertTrue(paceFeedback(recordedCycleMs * 2, recordedCycleMs) is ChantViewModel.ChantFeedback.VerySlow)
+    }
+
+    @Test
+    fun `2x auto-chant is very fast and red`() = runTest {
+        viewModel.setChantSpeed(2f)
+        testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.getCircleColor(viewModel.expectedBeadMillis())
+        assertTrue(viewModel.chantFeedback.value is ChantViewModel.ChantFeedback.VeryFast)
+        assertEquals(colorRed, viewModel.color.value)
     }
 
     @Test

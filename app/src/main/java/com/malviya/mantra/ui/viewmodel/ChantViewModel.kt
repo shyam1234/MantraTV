@@ -199,8 +199,9 @@ class ChantViewModel : ViewModel() {
         Timber.d("toggleAutoChant")
         _isAutoChanting.value = !_isAutoChanting.value
         if (_isAutoChanting.value) {
-            // Start audio playback with looping
+            oneBidTAT = System.currentTimeMillis()
             audioManager?.startAudio()
+            getCircleColor(expectedBeadMillis())
         } else {
             // Stop audio playback
             audioManager?.stopAudio()
@@ -216,6 +217,11 @@ class ChantViewModel : ViewModel() {
         _chantSpeed.value = snapped
         audioManager?.setPlaybackSpeed(snapped)
         appContext?.let { ChantSpeedStore.write(it, snapped) }
+        if (_isAutoChanting.value) {
+            getCircleColor(expectedBeadMillis())
+        } else if (_count.value > 0 && _oneBeadTimeForRendering.value > 0L) {
+            getCircleColor(_oneBeadTimeForRendering.value)
+        }
     }
 
 
@@ -271,8 +277,14 @@ class ChantViewModel : ViewModel() {
                 _chantLogs.value += ChantLog(_malaNumber.value, malaCompletedTime, totalTime)
                 logSampurnaMala(_malaNumber.value, (malaCompletedTime/AppConstants.TimeFormat.MILLISECONDS_IN_MINUTE))
             } else {
-                    _oneBeadTimeForRendering.value = (System.currentTimeMillis() - oneBidTAT).toLong()
-                    // Increment the bead count
+                    val elapsed = (System.currentTimeMillis() - oneBidTAT).coerceAtLeast(0L)
+                    // Auto-chant uses the speed's real cycle. The gap between audio
+                    // loops is not part of the chant, and it was marking 2× as slow.
+                    _oneBeadTimeForRendering.value = if (_isAutoChanting.value) {
+                        expectedBeadMillis()
+                    } else {
+                        elapsed
+                    }
                     oneBidTAT = System.currentTimeMillis()
                     _count.value += 1
             }
@@ -280,10 +292,10 @@ class ChantViewModel : ViewModel() {
             // Start time when count is 1 (first bead in mala)
             if (_count.value == 0) {
                 startTime = System.currentTimeMillis()
-                _oneBeadTimeForRendering.value = AppConstants.IDLE_TIME_FOR_ONE_BEAD
+                _oneBeadTimeForRendering.value = expectedBeadMillis()
+            } else {
+                getCircleColor(_oneBeadTimeForRendering.value)
             }
-
-            getCircleColor(_oneBeadTimeForRendering.asStateFlow().value)
 
             Timber.d("one bead count: ${_count.value}, time: ${_oneBeadTimeForRendering.asStateFlow().value}")
         }
@@ -308,44 +320,54 @@ class ChantViewModel : ViewModel() {
     }
 
     /**
-     * Updates UI color and feedback based on chanting speed
-     * 
-     * @param timeConsumedForOneBid Time taken for the last bead in milliseconds
-     * 
-     * Determines the appropriate color and feedback message based on timing thresholds:
-     * - Very Fast (0-2999ms): Red color
-     * - Fast (3000-3500ms): Red color  
-     * - Good (3501-4900ms): Green color
-     * - Slow Than Usual (4901-6000ms): Yellow color
-     * - Slow (6001-8000ms): Yellow color
-     * - Very Slow (8000ms+): Yellow color
+     * Length of one mantra at the recorded pace, before the speed control.
      */
-    fun getCircleColor(timeConsumedForOneBid: Long){
-        when(timeConsumedForOneBid){
-            in 0..AppConstants.VERY_FAST_THRESHOLD -> {
+    fun recordedCycleMillis(): Long {
+        return audioManager?.cycleDurationMs()?.takeIf { it > 0L }
+            ?: AppConstants.IDLE_TIME_FOR_ONE_BEAD
+    }
+
+    /**
+     * How long one bead takes at the current auto-chant speed.
+     * 2× is half the recording, so it is a fast chant, not the new "good" pace.
+     */
+    fun expectedBeadMillis(): Long {
+        val speed = _chantSpeed.value.toDouble().coerceAtLeast(0.1)
+        return (recordedCycleMillis() / speed).toLong().coerceAtLeast(1L)
+    }
+
+    /**
+     * Colors the bead from how its time compares with the recorded chant.
+     * Faster than the recording is red. The recording itself is green.
+     * Slower than the recording is yellow.
+     */
+    fun getCircleColor(timeConsumedForOneBid: Long) {
+        when (paceFeedback(timeConsumedForOneBid, recordedCycleMillis())) {
+            ChantFeedback.VeryFast -> {
                 _color.value = colorRed
                 _chantFeedback.value = ChantFeedback.VeryFast
             }
-            in (AppConstants.VERY_FAST_THRESHOLD + 1)..AppConstants.FAST_THRESHOLD -> {
+            ChantFeedback.Fast -> {
                 _color.value = colorRed
                 _chantFeedback.value = ChantFeedback.Fast
             }
-            in (AppConstants.FAST_THRESHOLD + 1)..AppConstants.GOOD_THRESHOLD -> {
+            ChantFeedback.Good -> {
                 _color.value = colorGreen
                 _chantFeedback.value = ChantFeedback.Good
             }
-            in (AppConstants.GOOD_THRESHOLD + 1)..AppConstants.SLOW_THAN_USUAL_THRESHOLD -> {
+            ChantFeedback.SlowThanUsual -> {
                 _color.value = colorYellow
                 _chantFeedback.value = ChantFeedback.SlowThanUsual
             }
-            in (AppConstants.SLOW_THAN_USUAL_THRESHOLD + 1)..AppConstants.SLOW_THRESHOLD -> {
+            ChantFeedback.Slow -> {
                 _color.value = colorYellow
                 _chantFeedback.value = ChantFeedback.Slow
             }
-            else -> {
+            ChantFeedback.VerySlow -> {
                 _color.value = colorYellow
                 _chantFeedback.value = ChantFeedback.VerySlow
             }
+            ChantFeedback.Begin -> Unit
         }
     }
 
@@ -402,3 +424,23 @@ class ChantViewModel : ViewModel() {
         chantJob = null
     }
 }
+
+/**
+ * Compares one bead with the recorded chant. [recordedMs] is one cycle at 1×.
+ * Half of that (2× speed) is very fast. The recording itself is a good pace.
+ */
+internal fun paceFeedback(timeMs: Long, recordedMs: Long): ChantViewModel.ChantFeedback {
+    if (recordedMs <= 0L) return ChantViewModel.ChantFeedback.Begin
+    val pace = AppConstants.IDLE_TIME_FOR_ONE_BEAD.toDouble()
+    val ratio = timeMs.toDouble() / recordedMs.toDouble()
+    return when {
+        ratio <= AppConstants.VERY_FAST_THRESHOLD / pace -> ChantViewModel.ChantFeedback.VeryFast
+        ratio <= AppConstants.FAST_THRESHOLD / pace -> ChantViewModel.ChantFeedback.Fast
+        ratio <= GOOD_PACE_RATIO -> ChantViewModel.ChantFeedback.Good
+        ratio <= AppConstants.SLOW_THAN_USUAL_THRESHOLD / pace -> ChantViewModel.ChantFeedback.SlowThanUsual
+        ratio <= AppConstants.SLOW_THRESHOLD / pace -> ChantViewModel.ChantFeedback.Slow
+        else -> ChantViewModel.ChantFeedback.VerySlow
+    }
+}
+
+private const val GOOD_PACE_RATIO = 1.08

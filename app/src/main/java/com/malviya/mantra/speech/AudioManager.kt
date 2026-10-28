@@ -418,6 +418,16 @@ class AudioManager(
     }
     
     /**
+     * Length of one recorded mantra cycle, before playback speed is applied.
+     */
+    fun cycleDurationMs(): Long {
+        val duration = mediaPlayer?.duration ?: 0
+        if (duration > 0) return duration.toLong()
+        val lastTimestamp = timingData.lastOrNull()?.timestamp ?: 0L
+        return if (lastTimestamp > 0L) lastTimestamp else AppConstants.IDLE_TIME_FOR_ONE_BEAD
+    }
+
+    /**
      * Changes how fast one mantra cycle plays. 1.0 is the recorded pace.
      */
     fun setPlaybackSpeed(speed: Float) {
